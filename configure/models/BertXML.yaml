@@ -1,0 +1,10 @@
+name: BertXML
+
+model:
+  hidden_size: 300
+  n_aheads: 2
+  intermediate_size: 600
+  n_layers: 2
+  n_probes: 5
+  dropout: 0.1
+  src_max_len: 500

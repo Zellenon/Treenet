@@ -1,0 +1,30 @@
+name: MIMIC2
+
+train:
+  texts: MIMIC2/train_icd10_text.npy
+  labels: MIMIC2/train_icd10_codes.npy
+  labels-tree: MIMIC2/train_icd10tree_codes.npy
+  batch_size: 500
+  nb_epoch: 13
+  swa_warmup: 2
+
+valid:
+  size: 4000
+  batch_size: 500
+
+predict:
+  batch_size: 200
+
+test:
+  texts: MIMIC2/test_icd10_text.npy
+
+embedding:
+  emb_init: MIMIC2/emb_init10.npy
+
+output:
+  res: MIMIC2/results10
+
+labels_binarizer: MIMIC2/labels_binarizer10
+
+model:
+  emb_size: 300

@@ -1,0 +1,29 @@
+name: Wiki-500K
+
+train:
+  texts: Wiki-500K/train_texts.npy
+  labels: Wiki-500K/train_labels.npy
+  batch_size: 200
+  nb_epoch: 15
+  swa_warmup: 4
+
+valid:
+  size: 4000
+  batch_size: 200
+
+predict:
+  batch_size: 200
+
+test:
+  texts: Wiki-500K/test_texts.npy
+
+embedding:
+  emb_init: Wiki-500K/emb_init.npy
+
+output:
+  res: Wiki-500K/results
+
+labels_binarizer: Wiki-500K/labels_binarizer
+
+model:
+  emb_size: 300

@@ -1,0 +1,23 @@
+name: MIMIC
+
+train:
+  texts: MIMIC/train_texts.npy
+  labels: MIMIC/train_labels.npy
+
+valid:
+  size: 89855
+
+test:
+  texts: MIMIC/MIMIC2.npy
+
+
+embedding:
+  emb_init: MIMIC/emb_init.npy
+
+output:
+  res: MIMIC/results
+
+labels_binarizer: MIMIC/labels_binarizer
+
+model:
+  emb_size: 400

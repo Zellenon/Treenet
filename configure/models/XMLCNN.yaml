@@ -1,0 +1,7 @@
+name: XMLCNN
+
+model:
+  dynamic_pool_length: 8
+  bottleneck_dim: 512
+  num_filters: 128
+  dropout: 0.5

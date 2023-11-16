@@ -1,0 +1,29 @@
+name: MeSH
+
+train:
+  texts: MeSH/train_texts.npy
+  labels: MeSH/train_labels.npy
+  batch_size: 500
+  nb_epoch: 11 # CHANGE THIS BACK
+  swa_warmup: 2
+
+valid:
+  size: 89855
+  batch_size: 500
+
+predict:
+  batch_size: 200
+
+test:
+  texts: MeSH/test_texts.npy
+
+embedding:
+  emb_init: MeSH/emb_init.npy
+
+output:
+  res: MeSH/results
+
+labels_binarizer: MeSH/labels_binarizer
+
+model:
+  emb_size: 100

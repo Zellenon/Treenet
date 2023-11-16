@@ -1,0 +1,13 @@
+simple_term_menu
+torch
+sqlalchemy
+scikit-learn
+numpy
+chromadb
+logzero
+pyyaml
+pathlib
+gensim
+torchgpipe
+nltk
+more_itertools
