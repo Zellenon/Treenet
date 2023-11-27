@@ -3,22 +3,16 @@
 from simple_term_menu import TerminalMenu
 from yaml import safe_load
 
-from global_config import (
-    DatasetConfig,
-    Path,
-    data_dir,
-    dataset_config_dir,
-    model_config_dir,
-)
-
 
 def select_path(parent, glob):
+    from pathlib import (Path)
     items = [str(w) for w in parent.glob(glob)]
     terminal_menu = TerminalMenu(items)
     return Path(items[terminal_menu.show()])
 
 
 def select_yaml(dir):
+    from pathlib import (Path)
     selection = select_path(dir, "*.yaml")
     with open(Path(selection)) as f:
         params = safe_load(f)
@@ -27,6 +21,10 @@ def select_yaml(dir):
 
 def new_dataset():
     from db import add_database
+    from global_config import (
+        DatasetConfig,
+        dataset_config_dir,
+    )
 
     params = DatasetConfig(select_yaml(dataset_config_dir))
     replace_behaviors = ["Overwrite existing entries", "Skip existing entries"]
@@ -35,14 +33,23 @@ def new_dataset():
 
 
 def pre_process():
+    from global_config import (
+        DatasetConfig,
+        dataset_config_dir,
+    )
     params = DatasetConfig(select_yaml(dataset_config_dir))
 
     from preprocess import process
 
-    process(params)
+    process(params, vocab_size=500000, max_len=500)
 
 
 def train():
+    from global_config import (
+        DatasetConfig,
+        dataset_config_dir,
+        model_config_dir,
+    )
     dataset_params = DatasetConfig(select_yaml(dataset_config_dir))
     model_params = select_yaml(model_config_dir)
     refiner = ["None", "CorNet", "TreeNet"]
