@@ -1,29 +1,29 @@
 name: EUR-Lex
+batch_size: 200
 
 train:
-  texts: EUR-Lex/train_texts.npy
-  labels: EUR-Lex/train_labels.npy
+  texts: train_texts.txt
+  labels: train_labels.txt
   batch_size: 40
   nb_epoch: 30
   swa_warmup: 10
 
 valid:
   size: 200
-  batch_size: 40
-
-predict:
-  batch_size: 40
 
 test:
-  texts: EUR-Lex/test_texts.npy
+  texts: test_texts.txt
+  labels: test_labels.txt
 
 embedding:
-  emb_init: EUR-Lex/emb_init.npy
+  emb_init: emb_init.npy
 
 output:
   res: EUR-Lex/results
 
-labels_binarizer: EUR-Lex/labels_binarizer
-
 model:
   emb_size: 300
+
+label_binarizer: label_binarizer
+
+vocab: vocab.npy
