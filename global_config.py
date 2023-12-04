@@ -1,14 +1,12 @@
 from pathlib import Path
 
 import numpy as np
-# import gensim.downloader
 
 data_dir = Path("data/")
 config_dir = Path("configure/")
 model_config_dir = config_dir / Path("models")
 dataset_config_dir = config_dir / Path("datasets")
 results_dir = Path("results/")
-# w2v = gensim.downloader.load("conceptnet-numberbatch-17-06-300")
 
 
 class DatasetConfig:
