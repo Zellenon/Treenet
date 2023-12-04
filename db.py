@@ -1,5 +1,4 @@
 import chromadb
-from more_itertools import batched
 from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 
@@ -19,6 +18,7 @@ def get_collection(name: str):
 
 
 def add_database3(cfg):
+    from more_itertools import batched
     try:
         client.delete_collection(cfg.name)
     except:
