@@ -53,7 +53,7 @@ def build_binarizer(cfg: DatasetConfig):
         cfg.label_binarizer.unlink()
     print("Collecting labels")
     labels = [set(line.split()) for line in open(cfg.data["train"].labels).readlines()]
-    labels = map(lambda x: sum(x, {}), labels)
+    labels = map(lambda x: sum(x, set()), labels)
     labels = sum(labels)
     print("Training MLB on labels")
     get_mlb(cfg.label_binarizer, labels)
