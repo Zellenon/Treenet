@@ -7,6 +7,10 @@ import re
 from logzero import logger
 from deepxml.data_utils import build_vocab, convert_to_binary
 import numpy as np
+from functools import reduce
+
+# Good for debugging, not needed for function
+# import ipdb
 
 def tokenize(sentence: str, sep='/SEP/'):
     # We added a /SEP/ symbol between titles and descriptions such as Amazon datasets.
@@ -52,8 +56,8 @@ def build_binarizer(cfg: DatasetConfig):
     if cfg.label_binarizer.exists():
         cfg.label_binarizer.unlink()
     print("Collecting labels")
-    labels = [set(line.split()) for line in open(cfg.data["train"].labels).readlines()]
-    labels = map(lambda x: sum(x, set()), labels)
-    labels = sum(labels)
+    def reduce_fun(a,b):
+        return a | b
+    labels = reduce(reduce_fun, [set(line.split()) for line in open(cfg.data["train"].labels).readlines()])
     print("Training MLB on labels")
     get_mlb(cfg.label_binarizer, labels)
