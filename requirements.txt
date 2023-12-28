@@ -11,3 +11,4 @@ gensim
 torchgpipe
 nltk
 more_itertools
+sentence_transformers
