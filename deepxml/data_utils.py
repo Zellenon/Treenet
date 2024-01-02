@@ -6,7 +6,7 @@ from sklearn.preprocessing import MultiLabelBinarizer, normalize
 from sklearn.datasets import load_svmlight_file
 from gensim.models import KeyedVectors
 from tqdm import tqdm
-from typing import Union, Iterable
+from typing import Union, Iterable, Tuple, Dict
 
 from global_config import DatasetSubConfig
 
@@ -37,11 +37,11 @@ def get_word_emb(vec_path, vocab_path=None):
         return np.load(vec_path)
 
 
-def get_data(cfg_data: DatasetSubConfig):
+def get_data(cfg_data: DatasetSubConfig) -> tuple[np.ndarray, np.ndarray | None]:
     return np.load(cfg_data.text_npy, allow_pickle=True), np.load(cfg_data.labels_npy, allow_pickle=True) if cfg_data.labels_npy is not None else None
 
 
-def convert_to_binary(text_file, label_file=None, max_len=None, vocab=None, pad='<PAD>', unknown='<UNK>'):
+def convert_to_binary(text_file, label_file=None, max_len=None, vocab: Dict = dict(), pad='<PAD>', unknown='<UNK>'):
     with open(text_file) as fp:
         texts = [[vocab.get(word, vocab[unknown]) for word in line.split()]
                            for line in tqdm(fp, desc='Converting token to id', leave=False)]
