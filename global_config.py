@@ -21,7 +21,10 @@ class DatasetConfig:
         }
         self.vocab = self.folder / Path(yaml["vocab"])
         self.emb_init_path = self.folder / Path(yaml["embedding"]["emb_init"])
-        self.emb_init = np.load(self.emb_init_path, allow_pickle=True)
+        try:
+            self.emb_init = np.load(self.emb_init_path, allow_pickle=True)
+        except:
+            pass
         self.label_binarizer = self.folder / Path(yaml.get(*["label_binarizer"] * 2))
         self.valid_size = yaml["valid"]["size"]
         self.batch_size = yaml["batch_size"]
@@ -32,6 +35,6 @@ class DatasetConfig:
 class DatasetSubConfig:
     def __init__(self, split, folder, yaml) -> None:
         self.text = folder / Path(yaml[split]["texts"])
-        self.text_npy = self.text.parent / (self.text.name + ".npy")
+        self.text_npy = self.text.parent / (self.text.name.split(".")[0] + ".npy")
         self.labels = folder / Path(yaml[split]["labels"])
-        self.labels_npy = self.labels.parent / (self.labels.name + ".npy")
+        self.labels_npy = self.labels.parent / (self.labels.name.split(".")[0] + ".npy")
