@@ -1,10 +1,12 @@
-name: MIMIC2TreeA
+name: MIMIC4Tree
+foldername: MIMIC4
+batch_size: 500
 
 train:
-  texts: MIMIC2/train_icd10_text.npy
-  labels: MIMIC2/train_icd10tree_codes.npy
+  texts: train_icd10_text.txt
+  labels: train_icd10_tree_codes.txt
   batch_size: 600
-  nb_epoch: 11 # CHANGE THIS BACK
+  nb_epoch: 33 # CHANGE THIS BACK
   swa_warmup: 2
 
 valid:
@@ -15,15 +17,18 @@ predict:
   batch_size: 500
 
 test:
-  texts: MIMIC2/test_icd10_text.npy
+  texts: test_icd10_text.txt
+  labels: test_icd10_tree_codes.txt
 
 embedding:
-  emb_init: MIMIC2/emb_init10-tree.npy
+  emb_init: emb_init10-tree.npy
 
 output:
-  res: MIMIC2/results10treeA
+  res: results10treeA
 
-labels_binarizer: MIMIC2/labels_binarizer10treeA
+labels_binarizer: labels_binarizer10treeA
 
 model:
   emb_size: 300
+
+vocab: vocab.npy

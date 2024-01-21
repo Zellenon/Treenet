@@ -9,7 +9,7 @@ train:
   swa_warmup: 10
 
 valid:
-  size: 200
+  size: 1500
 
 test:
   texts: test_texts.txt
@@ -19,7 +19,7 @@ embedding:
   emb_init: emb_init.npy
 
 output:
-  res: EUR-Lex/results
+  res: results
 
 model:
   emb_size: 300
