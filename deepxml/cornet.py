@@ -36,9 +36,14 @@ class CorNet(nn.Module):
 
 
 class CorNetWrapper(nn.Module):
-    def __init__(self, backbone, labels_num, **kwargs):
+    def FromConstructor(self, backbone, labels_num, **kwargs):
         super(CorNetWrapper, self).__init__()
         self.backbone = backbone(labels_num, **kwargs)
+        self.cornet = CorNet(labels_num, **kwargs)
+
+    def FromModel(self, backbone, labels_num, **kwargs):
+        super(CorNetWrapper, self).__init__()
+        self.backbone = backbone
         self.cornet = CorNet(labels_num, **kwargs)
             
     def forward(self, input_variables):
