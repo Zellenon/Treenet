@@ -1,7 +1,0 @@
-name: CorNetAttentionXML
-
-model:
-  hidden_size: 200
-  layers_num: 1
-  linear_size: [100]
-  dropout: 0.5
