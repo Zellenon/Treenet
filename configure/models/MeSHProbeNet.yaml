@@ -1,7 +1,8 @@
 name: MeSHProbeNet
 
-hidden_size: 300
-n_layers: 2
-n_probes: 5
-dropout: 0.5
+params:
+  hidden_size: 300
+  n_layers: 2
+  n_probes: 5
+  dropout: 0.5
 

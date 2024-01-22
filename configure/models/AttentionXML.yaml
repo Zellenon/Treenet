@@ -1,8 +1,9 @@
 name: AttentionXML
 
-hidden_size: 200
-layers_num: 1
-linear_size: [100]
-dropout: 0.5
-nb_epoch: 30
-swa_warmup: 10
+params:
+  hidden_size: 200
+  layers_num: 1
+  linear_size: [100]
+  dropout: 0.5
+  nb_epoch: 30
+  swa_warmup: 10
