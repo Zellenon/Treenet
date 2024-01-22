@@ -63,7 +63,7 @@ def train_model(cfg: DatasetConfig, model_cnf, refiner):
         cfg.batch_size,
         num_workers=4,
     )
-    if "gpipe" not in model_cnf:
+    if "gpipe" not in model_cnf and "gpipe" not in model_cnf["params"]:
         model = Model(
             network=model_dict[model_name],
             labels_num=labels_num,
@@ -83,7 +83,7 @@ def train_model(cfg: DatasetConfig, model_cnf, refiner):
         )
     if refiner == "CorNet":
         model = CorNetWrapper(model)
-    model.train(train_loader, valid_loader, **model_cnf)
+    model.train(train_loader, valid_loader, **model_cnf["params"])
     # model.train(train_loader, valid_loader)
     logger.info("Finish Training")
 
