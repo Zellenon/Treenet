@@ -39,7 +39,6 @@ def train_model(cfg: DatasetConfig, model_cnf, refiner):
     labels_num = len(mlb.classes_)
     emb_init = cfg.emb_init
 
-
     logger.info("Loading Training and Validation Set")
     train_x, train_labels = get_data(cfg.data["train"])
     random_state = 1240
@@ -63,14 +62,14 @@ def train_model(cfg: DatasetConfig, model_cnf, refiner):
         cfg.batch_size,
         num_workers=4,
     )
-    if "gpipe" not in model_cnf and "gpipe" not in model_cnf["params"]:
+    if "gpipe" not in model_cnf:
         model = Model(
             network=model_dict[model_name],
             labels_num=labels_num,
             model_path=model_path,
             emb_init=emb_init,
             **cfg.model,
-            **model_cnf,
+            **model_cnf["params"],
         )
     else:
         model = GPipeModel(
@@ -79,12 +78,10 @@ def train_model(cfg: DatasetConfig, model_cnf, refiner):
             model_path=model_path,
             emb_init=emb_init,
             **cfg.model,
-            **model_cnf,
+            **model_cnf["params"],
         )
     if refiner == "CorNet":
-        model = CorNetWrapper(model)
-    model.train(train_loader, valid_loader, **model_cnf["params"])
+        model.model = CorNetWrapper(backbone=model.model, labels_num=labels_num)
+    model.train(train_loader, valid_loader, **model_cnf["train"])
     # model.train(train_loader, valid_loader)
     logger.info("Finish Training")
-
-
