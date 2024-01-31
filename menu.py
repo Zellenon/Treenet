@@ -59,10 +59,12 @@ def evaluate():
 
     dataset_params = DatasetConfig(select_yaml(dataset_config_dir))
     model_params = select_yaml(model_config_dir)
+    refiner = ["None", "CorNet", "TreeNet"]
+    refiner_choice = TerminalMenu(refiner).show()
 
     from evaluation import evaluate
 
-    evaluate(dataset_params, model_params)
+    evaluate(dataset_params, model_params, refiner[refiner_choice])
 
 
 DB = "Load New Dataset"
