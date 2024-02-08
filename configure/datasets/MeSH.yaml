@@ -1,10 +1,11 @@
 name: MeSH
+batch_size: 500
 
 train:
-  texts: MeSH/train_texts.npy
-  labels: MeSH/train_labels.npy
+  texts: train_texts.npy
+  labels: train_labels.npy
   batch_size: 500
-  nb_epoch: 11 # CHANGE THIS BACK
+  nb_epoch: 33
   swa_warmup: 2
 
 valid:
@@ -15,7 +16,7 @@ predict:
   batch_size: 200
 
 test:
-  texts: MeSH/test_texts.npy
+  texts: test_texts.npy
 
 embedding:
   emb_init: MeSH/emb_init.npy
