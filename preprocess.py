@@ -45,6 +45,7 @@ def process(cfg: DatasetConfig, vocab_size: int, max_len: int):
         texts, labels = convert_to_binary(
             textpath.parent / (textpath.name + ""), labelpath, max_len, vocab
         )
+        [[n for n in w if len(n) > 0] for w in labels]
         logger.info(f"Size of Samples: {len(texts)}")
         np.save(cfg.data[split].text_npy, texts)
         if labels is not None:
@@ -71,7 +72,6 @@ def build_binarizer(cfg: DatasetConfig):
     if cfg.label_binarizer.exists():
         cfg.label_binarizer.unlink()
     print("Collecting labels")
-    # ipdb.set_trace()
 
     def reduce_fun(a, b):
         return a | b
@@ -83,6 +83,17 @@ def build_binarizer(cfg: DatasetConfig):
             for line in open(cfg.data["train"].labels).readlines()
         ],
     )
+
+    labels = labels | reduce(
+        reduce_fun,
+        [
+            set(re.split(spliter, line))
+            for line in open(cfg.data["test"].labels).readlines()
+        ],
+    )
+
+    labels = {w for w in labels if len(w) > 0}
+
     print(labels)
     print("Training MLB on labels")
     get_mlb(cfg.label_binarizer, [labels])
