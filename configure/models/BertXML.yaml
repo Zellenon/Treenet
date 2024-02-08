@@ -1,6 +1,6 @@
 name: BertXML
 
-model:
+params:
   hidden_size: 300
   n_aheads: 2
   intermediate_size: 600
@@ -8,3 +8,8 @@ model:
   n_probes: 5
   dropout: 0.1
   src_max_len: 500
+
+train:
+  batch_size: 40
+  nb_epoch: 30
+  swa_warmup: 10

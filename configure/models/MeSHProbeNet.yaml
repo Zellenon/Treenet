@@ -6,3 +6,9 @@ params:
   n_probes: 5
   dropout: 0.5
 
+train:
+  batch_size: 500
+  nb_epoch: 30
+  swa_warmup: 10
+
+
