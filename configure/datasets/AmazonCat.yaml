@@ -19,6 +19,9 @@ embedding:
 
 label_binarizer: label_binarizer
 
+output:
+  res: results
+
 vocab: vocab.npy
 
 model:
