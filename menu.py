@@ -71,8 +71,14 @@ DB = "Load New Dataset"
 PRE = "Pre-process Database"
 TRAIN = "Train Model with Dataset"
 EVAL = "Evaluate Trained Model"
-main_menu_exits = {DB: new_dataset, PRE: pre_process, TRAIN: train, EVAL: evaluate}
+main_menu_exits = {
+    DB: new_dataset,
+    PRE: pre_process,
+    TRAIN: train,
+    EVAL: evaluate
+}
 
-terminal_menu = TerminalMenu([DB, PRE, TRAIN, EVAL])
-main_menu_choice = terminal_menu.show()
-main_menu_exits[[DB, PRE, TRAIN, EVAL][main_menu_choice or 0]]()
+if __name__ == "__main__":
+    terminal_menu = TerminalMenu([DB, PRE, TRAIN, EVAL])
+    main_menu_choice = terminal_menu.show()
+    main_menu_exits[[DB, PRE, TRAIN, EVAL][main_menu_choice or 0]]()
