@@ -67,7 +67,6 @@ def get_refiners():
 def dataset_selector():
     from global_config import dataset_config_dir
 
-    newline = "\n"
     menu = MultiSelectMenu(
         "Dataset Selection",
         get_datasets,
@@ -131,8 +130,8 @@ def task_selector():
     return menu
 
 
-def pre_process(dataset_cfg_path, _, _):
-    from global_config import DatasetConfig, dataset_config_dir
+def pre_process(dataset_cfg_path, _, _2):
+    from global_config import DatasetConfig
     from preprocess import process
 
     process(DatasetConfig(safe_load(open(dataset_cfg_path))),
@@ -199,8 +198,11 @@ if __name__ == "__main__":
         if not selected_tasks[k]:
             continue
         for dataset in selected_datasets:
-            if len(selected_models) < 1:
-                selected_models = {""}
-            for model in selected_models:
-                print(f"{k} with {model}-{dataset}")
-                func(dataset, model)
+            for refiner in selected_refiners.keys():
+                if not selected_refiners[refiner]:
+                    continue
+                if len(selected_models) < 1:
+                    selected_models = {""}
+                for model in selected_models:
+                    print(f"{k} with {model}-{dataset}-{refiner}")
+                    func(dataset, model, refiner)
