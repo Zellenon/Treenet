@@ -7,7 +7,8 @@ from db import ChromaLoader
 from deepxml.attentionxml import AttentionXML, CorNetAttentionXML
 from deepxml.bertxml import BertXML, CorNetBertXML
 from deepxml.cornet import CorNet, CorNetWrapper
-from deepxml.data_utils import get_data, get_mlb, get_word_emb
+from deepxml.data_utils import get_data, get_mlb
+from deepxml.data_utils import output_res
 from deepxml.dataset import MultiLabelDataset
 from deepxml.meshprobenet import CorNetMeSHProbeNet, MeSHProbeNet, TreeNetMeSHProbeNet
 from deepxml.models import GPipeModel, Model
@@ -90,36 +91,18 @@ def train_model(cfg: DatasetConfig, model_cnf, refiner):
 
     # Temp code
     logger.info("Loading Test Set")
-    import joblib
 
-    mlb = joblib.load(cfg.label_binarizer)
     all_labels = mlb.classes_
 
     labels_num = len(all_labels)
     logger.info(f"Found a total of {labels_num} labels in the dataset")
     test_x, _ = get_data(cfg.data["test"])
     logger.info(f"Size of Test Set: {len(test_x)}")
-    trained_model_path = Path(f"results/models/{model_cfg['name']}-{cfg.name}")
 
     logger.info("Predicting")
     test_loader = DataLoader(MultiLabelDataset(test_x),
                              cfg.batch_size,
                              num_workers=4)
-    model = (GPipeModel(
-        model_cfg["name"],
-        labels_num=labels_num,
-        model_path=trained_model_path,
-        emb_init=cfg.emb_init,
-        **cfg.model,
-        **model_cfg,
-    ) if "gpipe" in model_cfg else Model(
-        network=model_dict[model_cfg["name"]],
-        labels_num=labels_num,
-        model_path=trained_model_path,
-        emb_init=cfg.emb_init,
-        **cfg.model,
-        **model_cfg["params"],
-    ))
     predicted_scores, predicted_labels_encoded = model.predict(
         test_loader, k=cfg.valid_size)
     predicted_labels_decoded = mlb.classes_[predicted_labels_encoded]
@@ -127,66 +110,8 @@ def train_model(cfg: DatasetConfig, model_cnf, refiner):
     alllabels = mlb.classes_
     output_res(
         cfg.output_dir,
-        f'{model_cfg["name"]}-{cfg.name}',
+        f'{model_cnf["name"]}-{cfg.name}-{refiner}',
         predicted_scores,
         predicted_labels_decoded,
     )
 
-    target_labels = np.load(cfg.data["test"].labels_npy, allow_pickle=True)
-    target_labels_transformed = mlb.fit_transform(target_labels)
-    logger.info("conversion loop 1 beginning")
-    target_scores = np.array([[1 if w in row else 0 for w in alllabels]
-                              for row in target_labels])
-
-    logger.info("Loading labels")
-    temp = [
-        zip(predicted_labels_decoded[i], predicted_scores[i])
-        for i in range(len(predicted_scores))
-    ]
-    prediction_dicts = [{u: v for u, v in w} for w in temp]
-    print("Formatting labels")
-    prediction_scores_sorted = [[w.get(v, 0) for v in alllabels]
-                                for w in prediction_dicts]
-    prediction_scores_sorted = np.array(prediction_scores_sorted)
-
-    print(target_scores.shape)
-    print(prediction_scores_sorted.shape)
-
-    # lower_bound = 0.0
-    # threshholds = [lower_bound + (w + 1) * ((1 - lower_bound) / 6) for w in range(0, 5)]
-    threshholds = []
-    # threshholds = [
-    #     np.median(prediction_scores_sorted),
-    #     prediction_scores_sorted.mean(),
-    #     prediction_scores_sorted.max() / 2,
-    # ]
-    n = [1, 3, 5]
-    averages = ["micro", "macro"]
-    score_funcs = [
-        (metrics.precision_score, "Precision"),
-        (metrics.recall_score, "Recall"),
-        (metrics.f1_score, "F1"),
-    ]
-
-    for threshhold in threshholds:
-        temp_predictions = prediction_scores_sorted > threshhold
-        for average in averages:
-            for func, name in score_funcs:
-                print(
-                    f"{average}-{name} at p>{threshhold}: {func(target_scores,temp_predictions, average=average)}"
-                )
-    from deepxml.evaluation import get_precision2, get_recall2, get_f1
-
-    score_funcs = [
-        (get_precision2, "Precision"),
-        (get_recall2, "Recall"),
-        (get_f1, "F1"),
-    ]
-
-    __import__("ipdb").set_trace()
-    for top_n in n:
-        for average in averages:
-            for func, name in score_funcs:
-                print(
-                    f"{average}-{name} at n={top_n}: {func(predicted_labels_decoded,target_labels, mlb, top=top_n, ave=average)}"
-                )
