@@ -160,7 +160,6 @@ def evaluate(dataset_cfg_path, model_cfg_path, refiner):
 
     dataset_params = DatasetConfig(safe_load(open(dataset_cfg_path)))
     model_params = safe_load(open(model_cfg_path))
-    refiner = ["None", "CorNet", "TreeNet"]
 
     evaluate(dataset_params, model_params, refiner)
 
@@ -193,6 +192,9 @@ if __name__ == "__main__":
     menu.append_item(task_menu)
     menu.start()
     menu.join()
+
+    if not any(selected_refiners.values()):
+        selected_refiners["None"] = True
 
     for k, func in main_menu_exits.items():
         if not selected_tasks[k]:
