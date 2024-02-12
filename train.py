@@ -29,6 +29,8 @@ model_dict = {
 
 
 def train_model(cfg: DatasetConfig, model_cnf, refiner):
+    import joblib
+
     model, model_name, data_name = None, model_cnf["name"], cfg.name
     model_path = results_dir / Path("models") / f"{model_name}-{data_name}"
     mlb = get_mlb(
@@ -88,30 +90,3 @@ def train_model(cfg: DatasetConfig, model_cnf, refiner):
     model.train(train_loader, valid_loader, **model_cnf["train"])
     # model.train(train_loader, valid_loader)
     logger.info("Finish Training")
-
-    # Temp code
-    logger.info("Loading Test Set")
-
-    all_labels = mlb.classes_
-
-    labels_num = len(all_labels)
-    logger.info(f"Found a total of {labels_num} labels in the dataset")
-    test_x, _ = get_data(cfg.data["test"])
-    logger.info(f"Size of Test Set: {len(test_x)}")
-
-    logger.info("Predicting")
-    test_loader = DataLoader(MultiLabelDataset(test_x),
-                             cfg.batch_size,
-                             num_workers=4)
-    predicted_scores, predicted_labels_encoded = model.predict(
-        test_loader, k=cfg.valid_size)
-    predicted_labels_decoded = mlb.classes_[predicted_labels_encoded]
-    logger.info("Finish Predicting")
-    alllabels = mlb.classes_
-    output_res(
-        cfg.output_dir,
-        f'{model_cnf["name"]}-{cfg.name}-{refiner}',
-        predicted_scores,
-        predicted_labels_decoded,
-    )
-
