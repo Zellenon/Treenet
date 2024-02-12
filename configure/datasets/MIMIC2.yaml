@@ -19,7 +19,7 @@ embedding:
   emb_init: emb_init10.npy
 
 output:
-  res: results10
+  res: results
 
 labels_binarizer: labels_binarizer10
 
