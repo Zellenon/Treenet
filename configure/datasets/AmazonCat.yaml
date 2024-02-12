@@ -4,6 +4,7 @@ batch_size: 200
 train:
   texts: train_texts.txt
   labels: train_labels.txt
+  batch_size: 40
   nb_epoch: 10
   swa_warmup: 2
 

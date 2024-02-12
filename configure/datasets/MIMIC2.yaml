@@ -5,6 +5,7 @@ train:
   texts: train_icd10_text.txt
   labels: train_icd10_codes.txt
   nb_epoch: 33
+  batch_size: 40
   swa_warmup: 2
 
 valid:
