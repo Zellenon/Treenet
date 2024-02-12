@@ -34,7 +34,6 @@ model_dict = {
 
 
 def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
-
     logger.info("Loading Test Set")
     import joblib
 
@@ -155,6 +154,23 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
     for func, name in score_funcs:
         log(f"{name} at n=5: {func(predicted_labels_decoded,target_labels, mlb)}"
             )
+
+    log("BertMESH Metrics")  # Hat is predicted
+    MiP = np.sum(predicted_scores * target_scores) / np.sum(predicted_scores)
+    MiR = np.sum(predicted_scores * target_scores) / np.sum(target_scores)
+    MiF = (2 * MiP * MiR) / (MiP + MiR)
+    MaPx = np.sum(predicted_scores * target_scores, axis=1) / np.sum(
+        predicted_scores, axis=1)
+    MaRx = np.sum(predicted_scores * target_scores, axis=1) / np.sum(
+        target_scores, axis=1)
+    MaF = (1 / labels_num) * np.sum((2 * MaPx * MaRx) / (MaPx + MaRx))
+    EBPi = np.sum(predicted_scores * target_scores, axis=0) / np.sum(
+        predicted_scores, axis=0)
+    EBRi = np.sum(predicted_scores * target_scores, axis=0) / np.sum(
+        target_scores, axis=0)
+    EBF = (1 / EBRi.shape[0]) * np.sum((2 * EBPi * EBRi) / (EBPi + EBRi))
+    log(f"MiP: {MiP}; MiR: {MiR}; MiF: {MiF}")
+    log(f"MaF: {MaF}; EBF: {EBF}")
 
 
 if __name__ == "__main__":
