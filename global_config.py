@@ -76,7 +76,11 @@ class AppConfig:
                         self.selected_models = {""}
                     for model in self.selected_models:
                         print(f"{k} with {model}-{dataset}-{refiner}")
-                        func(dataset, model, refiner)
+                        try:
+                            func(dataset, model, refiner)
+                        except Exception:
+                            print("Failed on {k} with {model}-{dataset}-{refiner}")
+                            print(Exception)
     
     def add_dataset(self, dataset):
             self.selected_datasets |= {dataset}
