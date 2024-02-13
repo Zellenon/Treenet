@@ -1,9 +1,7 @@
-simple_term_menu
+console-menu
 torch
-sqlalchemy
 scikit-learn
 numpy
-chromadb
 logzero
 pyyaml
 pathlib
@@ -12,3 +10,4 @@ torchgpipe
 nltk
 more_itertools
 sentence_transformers
+
