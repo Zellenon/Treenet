@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 
 from consolemenu import ConsoleMenu, MultiSelectMenu
-from consolemenu.items import MenuItem, SubmenuItem
+from consolemenu.items import SubmenuItem
 from consolemenu.items import FunctionItem
-
 from yaml import safe_load
+from colors import color
 
 PRE = "Pre-process Database"
 TRAIN = "Train Model with Dataset"
-RETEST = "Regenerate test predictions (normally done with training)"
+RETEST = "Regenerate test predictions"
 EVAL = "Evaluate Trained Model"
 main_menu_exits = {PRE: 0, TRAIN: 0, RETEST: 0, EVAL: 0}
 
-selected_tasks = {k: False for k, v in main_menu_exits.items()}
+selected_tasks = {k: False for k, _ in main_menu_exits.items()}
 selected_refiners = {k: False for k in ["None", "CorNet", "TreeNet"]}
 selected_datasets = set()
 selected_models = set()
@@ -51,7 +51,7 @@ def toggle_task(key):
 
 def get_tasks():
     global selected_tasks
-    return "\n".join([f"{k}: {v}" for k, v in selected_tasks.items()])
+    return "\n".join([f"{color(k, fg='green' if v else 'red')}" for k, v in selected_tasks.items()])
 
 
 def toggle_refiner(key):
@@ -61,7 +61,7 @@ def toggle_refiner(key):
 
 def get_refiners():
     global selected_refiners
-    return "\n".join([f"{k}: {v}" for k, v in selected_refiners.items()])
+    return "  ".join([f"{color(k, fg='green' if v else 'red')}" for k, v in selected_refiners.items()])
 
 
 def dataset_selector():
@@ -173,20 +173,24 @@ main_menu_exits = {
 
 
 def all_info():
-    return get_tasks() + "\n\n" + get_datasets() + "\n\n" + get_models()
+    return "\n\n".join([get_refiners(), get_tasks(), get_datasets(), get_models()])
 
 
 if __name__ == "__main__":
     menu = ConsoleMenu("Main Menu", all_info, exit_option_text="Execute Tasks")
+
     dataset_menu = SubmenuItem("Select Datasets", dataset_selector())
     dataset_menu.set_menu(menu)
     menu.append_item(dataset_menu)
+
     model_menu = SubmenuItem("Select Models", model_selector())
     model_menu.set_menu(menu)
     menu.append_item(model_menu)
+
     refiner_menu = SubmenuItem("Select Refiners", refiner_selector())
     refiner_menu.set_menu(menu)
     menu.append_item(refiner_menu)
+
     task_menu = SubmenuItem("Select Tasks", task_selector())
     task_menu.set_menu(menu)
     menu.append_item(task_menu)
