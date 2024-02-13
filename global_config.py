@@ -94,7 +94,7 @@ class AppConfig:
         self.selected_tasks[key] = not self.selected_tasks[key]
     
     def get_tasks(self):
-        return "\n".join([f"{color(k, fg='green' if v else 'red')}" for k, v in self.selected_tasks.items()])
+        return "\n".join([f"{color(self.task_names[k], fg='green' if v else 'red')}" for k, v in self.selected_tasks.items()])
     
     def toggle_refiner(self, key):
         self.selected_refiners[key] = not self.selected_refiners[key]
