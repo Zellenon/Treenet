@@ -7,6 +7,7 @@ from pathlib import Path
 import numpy as np
 from logzero import logger
 from sklearn import metrics
+from concurrent.futures import ThreadPoolExecutor
 from torch.utils.data import DataLoader
 
 from deepxml.attentionxml import AttentionXML, CorNetAttentionXML
@@ -100,11 +101,14 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
             )
 
     target_labels = np.load(cfg.data["test"].labels_npy, allow_pickle=True)
-    target_labels_transformed = mlb.fit_transform(target_labels)
     logger.info("conversion loop 1 beginning")
-    # target_scores = np.array([[1 if w in row else 0 for w in alllabels]
+    # target_score_filter = np.array([[w in row for w in all_labels]
     #                           for row in target_labels])
-    target_score_filter = np.array([(target_labels == w).any(axis=1) for w in all_labels]).T
+    with ThreadPoolExecutor(35) as exec:
+        target_score_filter = np.array(
+                exec.map(lambda row: [w in row for w in all_labels],
+                         target_labels))
+    # target_score_filter = np.array([(target_labels == w).any(axis=1) for w in all_labels]).T
     target_scores = np.zeros_like(target_score_filter)
     target_scores[target_score_filter] = 1
 
@@ -154,7 +158,6 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
             ]
 
     log("TOP-N METRICS")
-    # __import__("ipdb").set_trace()
     for top_n in n:
         for average in averages:
             for func, name in score_funcs:
