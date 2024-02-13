@@ -4,82 +4,22 @@ from consolemenu import ConsoleMenu, MultiSelectMenu
 from consolemenu.items import SubmenuItem
 from consolemenu.items import FunctionItem
 from yaml import safe_load
-from colors import color
 
-PRE = "Pre-process Database"
-TRAIN = "Train Model with Dataset"
-RETEST = "Regenerate test predictions"
-EVAL = "Evaluate Trained Model"
-main_menu_exits = {PRE: 0, TRAIN: 0, RETEST: 0, EVAL: 0}
+from global_config import AppConfig
 
-selected_tasks = {k: False for k, _ in main_menu_exits.items()}
-selected_refiners = {k: False for k in ["None", "CorNet", "TreeNet"]}
-selected_datasets = set()
-selected_models = set()
-
-
-def add_dataset(dataset):
-    global selected_datasets
-    try:
-        selected_datasets |= {dataset}
-    except:
-        print(f"Unable to add {dataset}")
-
-
-def get_datasets():
-    global selected_datasets
-    return "\n".join(selected_datasets)
-
-
-def add_model(model):
-    global selected_models
-    try:
-        selected_models |= {model}
-    except:
-        print(f"Unable to add {model}")
-
-
-def get_models():
-    global selected_models
-    return "\n".join(selected_models)
-
-
-def toggle_task(key):
-    global selected_tasks
-    selected_tasks[key] = not selected_tasks[key]
-
-
-def get_tasks():
-    global selected_tasks
-    return "\n".join([f"{color(k, fg='green' if v else 'red')}" for k, v in selected_tasks.items()])
-
-
-def toggle_refiner(key):
-    global selected_refiners
-    selected_refiners[key] = not selected_refiners[key]
-
-
-def get_refiners():
-    global selected_refiners
-    return "  ".join([f"{color(k, fg='green' if v else 'red')}" for k, v in selected_refiners.items()])
-
+app_config = AppConfig()
 
 def dataset_selector():
-    from global_config import dataset_config_dir
-
     menu = MultiSelectMenu(
         "Dataset Selection",
-        get_datasets,
+        app_config.get_datasets,
         epilogue_text=("Please select one or more entries separated by commas, and/or a range "
                        "of numbers. For example:  1,2,3   or   1-4   or   1,3-4"),
         exit_option_text="Back to Main",
     )
 
-    dataset_paths = [str(w) for w in dataset_config_dir.glob("*.yaml")]
-    datasets = [(w, safe_load(open(w))["name"]) for w in dataset_paths]
-
-    for path, name in datasets:
-        menu.append_item(FunctionItem(name, add_dataset, args=[path]))
+    for path, name in app_config.all_datasets:
+        menu.append_item(FunctionItem(name, app_config.add_dataset, args=[path]))
     return menu
 
 
@@ -88,45 +28,42 @@ def model_selector():
 
     menu = MultiSelectMenu(
         "Model Selection",
-        get_models,
+        app_config.get_models,
         epilogue_text=("Please select one or more entries separated by commas, and/or a range "
                        "of numbers. For example:  1,2,3   or   1-4   or   1,3-4"),
         exit_option_text="Back to Main",
     )
 
-    model_paths = [str(w) for w in model_config_dir.glob("*.yaml")]
-    models = [(w, safe_load(open(w))["name"]) for w in model_paths]
-
-    for path, name in models:
-        menu.append_item(FunctionItem(name, add_model, args=[path]))
+    for path, name in app_config.all_models:
+        menu.append_item(FunctionItem(name, app_config.add_model, args=[path]))
     return menu
 
 
 def refiner_selector():
     menu = MultiSelectMenu(
         "Refiner Selection",
-        get_refiners,
+        app_config.get_refiners,
         epilogue_text=("Please select one or more entries separated by commas, and/or a range "
                        "of numbers. For example:  1,2,3   or   1-4   or   1,3-4"),
         exit_option_text="Back to Main",
     )
 
-    for r in selected_refiners.keys():
-        menu.append_item(FunctionItem(r, toggle_refiner, args=[r]))
+    for r in app_config.selected_refiners.keys():
+        menu.append_item(FunctionItem(r, app_config.toggle_refiner, args=[r]))
     return menu
 
 
 def task_selector():
     menu = MultiSelectMenu(
         "Task Selection",
-        get_tasks,
+        app_config.get_tasks,
         epilogue_text=("Please select one or more entries separated by commas, and/or a range "
                        "of numbers. For example:  1,2,3   or   1-4   or   1,3-4"),
         exit_option_text="Back to Main",
     )
 
-    for k, v in selected_tasks.items():
-        menu.append_item(FunctionItem(k, toggle_task, args=[k]))
+    for k, v in app_config.selected_tasks.items():
+        menu.append_item(FunctionItem(k, app_config.toggle_task, args=[k]))
     return menu
 
 
@@ -164,20 +101,15 @@ def evaluate(dataset_cfg_path, model_cfg_path, refiner):
     evaluate(dataset_params, model_params, refiner)
 
 
-main_menu_exits = {
-    PRE: pre_process,
-    TRAIN: train,
-    RETEST: retest,
-    EVAL: evaluate
+app_config.tasks = {
+    "PRE": pre_process,
+    "TRAIN": train,
+    "RETEST": retest,
+    "EVAL": evaluate
 }
 
-
-def all_info():
-    return "\n\n".join([get_refiners(), get_tasks(), get_datasets(), get_models()])
-
-
 if __name__ == "__main__":
-    menu = ConsoleMenu("Main Menu", all_info, exit_option_text="Execute Tasks")
+    menu = ConsoleMenu("Main Menu", app_config.all_info, exit_option_text="Execute Tasks")
 
     dataset_menu = SubmenuItem("Select Datasets", dataset_selector())
     dataset_menu.set_menu(menu)
@@ -196,19 +128,5 @@ if __name__ == "__main__":
     menu.append_item(task_menu)
     menu.start()
     menu.join()
+    app_config.exec()
 
-    if not any(selected_refiners.values()):
-        selected_refiners["None"] = True
-
-    for k, func in main_menu_exits.items():
-        if not selected_tasks[k]:
-            continue
-        for dataset in selected_datasets:
-            for refiner in selected_refiners.keys():
-                if not selected_refiners[refiner]:
-                    continue
-                if len(selected_models) < 1:
-                    selected_models = {""}
-                for model in selected_models:
-                    print(f"{k} with {model}-{dataset}-{refiner}")
-                    func(dataset, model, refiner)
