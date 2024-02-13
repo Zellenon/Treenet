@@ -1,19 +1,16 @@
-import numpy as np
 from logzero import logger
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 
-from db import ChromaLoader
 from deepxml.attentionxml import AttentionXML, CorNetAttentionXML
 from deepxml.bertxml import BertXML, CorNetBertXML
-from deepxml.cornet import CorNet, CorNetWrapper
+from deepxml.cornet import CorNetWrapper
 from deepxml.data_utils import get_data, get_mlb
-from deepxml.data_utils import output_res
 from deepxml.dataset import MultiLabelDataset
 from deepxml.meshprobenet import CorNetMeSHProbeNet, MeSHProbeNet, TreeNetMeSHProbeNet
 from deepxml.models import GPipeModel, Model
 from deepxml.xmlcnn import XMLCNN, CorNetXMLCNN
-from global_config import DatasetConfig, Path, data_dir, results_dir
+from global_config import DatasetConfig, Path,  results_dir
 
 model_dict = {
     "AttentionXML": AttentionXML,
@@ -29,8 +26,6 @@ model_dict = {
 
 
 def train_model(cfg: DatasetConfig, model_cnf, refiner):
-    import joblib
-
     model, model_name, data_name = None, model_cnf["name"], cfg.name
     model_path = results_dir / Path("models") / f"{model_name}-{data_name}"
     mlb = get_mlb(
