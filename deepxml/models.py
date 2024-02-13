@@ -141,8 +141,9 @@ class Model(object):
             try:
                 torch.save(self.model.module.state_dict(), self.model_path)
                 break
-            except:
+            except Exception:
                 print("saving failed")
+                print(Exception)
 
     def load_model(self):
         self.model.module.load_state_dict(torch.load(self.model_path))
@@ -318,8 +319,9 @@ class GPipeModel(object):
             try:
                 torch.save(self.model.state_dict(), self.model_path)
                 break
-            except:
+            except Exception:
                 print("saving failed")
+                print(Exception)
 
     def load_model(self):
         self.model.load_state_dict(torch.load(self.model_path))
