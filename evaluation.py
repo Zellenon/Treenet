@@ -74,7 +74,7 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
         **model_cfg)
 
     predicted_scores, predicted_labels_encoded = model.predict(
-            test_loader, k=cfg.valid_size)
+            test_loader, k=labels_num) # TODO: This used to be cfg.valid_size. Maybe we need to change?
     predicted_labels_decoded = mlb.classes_[predicted_labels_encoded]
     logger.info("Finish Predicting")
 
@@ -91,8 +91,8 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
     #                           for row in target_labels])
     with ThreadPoolExecutor(35) as exec:
         target_score_filter = np.array(
-                exec.map(lambda row: [w in row for w in all_labels],
-                         target_labels))
+                list(exec.map(lambda row: [w in row for w in all_labels],
+                         target_labels)))
     # target_score_filter = np.array([(target_labels == w).any(axis=1) for w in all_labels]).T
     target_scores = np.zeros_like(target_score_filter)
     target_scores[target_score_filter] = 1
