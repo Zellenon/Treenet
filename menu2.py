@@ -63,7 +63,7 @@ def task_selector():
     )
 
     for k, v in app_config.selected_tasks.items():
-        menu.append_item(FunctionItem(k, app_config.toggle_task, args=[k]))
+        menu.append_item(FunctionItem(app_config.task_names[k], app_config.toggle_task, args=[k]))
     return menu
 
 
