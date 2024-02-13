@@ -28,7 +28,8 @@ model_dict = {
 def train_model(cfg: DatasetConfig, model_cfg, refiner):
     model, model_name, data_name = None, model_cfg["name"], cfg.name
     model_path = results_dir / Path("models") / f"{model_name}-{data_name}-{refiner}"
-    model_path.unlink()
+    if model_path.exists():
+        model_path.unlink()
     if not model_path.exists():
         print("Successfully deleted trained model")
     else:
