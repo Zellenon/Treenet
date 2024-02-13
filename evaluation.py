@@ -16,7 +16,8 @@ from deepxml.data_utils import get_data, output_res
 from deepxml.dataset import MultiLabelDataset
 from deepxml.evaluation import *
 from deepxml.meshprobenet import CorNetMeSHProbeNet, MeSHProbeNet, TreeNetMeSHProbeNet
-from deepxml.models import GPipeModel, Model
+from deepxml.models import Model
+from deepxml.models_gpipe import GPipeModel
 from deepxml.xmlcnn import XMLCNN, CorNetXMLCNN
 
 warnings.filterwarnings("ignore")
@@ -47,9 +48,9 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
     import joblib
 
     changeLogFile( 
-                 results_dir / Path(model_cfg["name"] + "-" + cfg.name + "-" +
-                                    refiner_choice + ".txt"),
-                 )
+                  results_dir / Path(model_cfg["name"] + "-" + cfg.name + "-" +
+                                     refiner_choice + ".txt"),
+                  )
 
     logger.info("Loading MLB")
     mlb = joblib.load(cfg.label_binarizer)
@@ -67,11 +68,11 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
                              num_workers=4)
     model = GPipeModel if "gpipe" in model_cfg else Model
     model = model(network=model_dict[model_cfg["name"]],
-        labels_num=labels_num,
-        model_path=trained_model_path,
-        emb_init=cfg.emb_init,
-        **cfg.model,
-        **model_cfg["params"])
+                  labels_num=labels_num,
+                  model_path=trained_model_path,
+                  emb_init=cfg.emb_init,
+                  **cfg.model,
+                  **model_cfg["params"])
 
     predicted_scores, predicted_labels_encoded = model.predict(
             test_loader, k=labels_num) # TODO: This used to be cfg.valid_size. Maybe we need to change?
@@ -88,11 +89,11 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
     target_labels = np.load(cfg.data["test"].labels_npy, allow_pickle=True)
     logger.info("conversion loop 1 beginning")
     # target_score_filter = np.array([[w in row for w in all_labels]
-    #                           for row in target_labels])
+                                      #                           for row in target_labels])
     with ThreadPoolExecutor(35) as exec:
         target_score_filter = np.array(
                 list(exec.map(lambda row: [w in row for w in all_labels],
-                         target_labels)))
+                              target_labels)))
     # target_score_filter = np.array([(target_labels == w).any(axis=1) for w in all_labels]).T
     target_scores = np.zeros_like(target_score_filter)
     target_scores[target_score_filter] = 1
@@ -113,11 +114,11 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
 
     # lower_bound = 0.0
     # threshholds = [lower_bound + (w + 1) * ((1 - lower_bound) / 6) for w in range(0, 5)]
-    threshholds = []
+    # threshholds = []
     threshholds = [
-            np.median(prediction_scores_sorted),
-            prediction_scores_sorted.mean(),
-            prediction_scores_sorted.max() / 2,
+            np.mean,
+            lambda *a, **k: np.max(*a, **k) / 2,
+            lambda a, **k: a[a > a.max(**k) / 2].mean(**k),
             ]
     n = [1, 3, 5]
     averages = ["micro", "macro"]
@@ -129,19 +130,30 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
 
     log("THRESHHOLD METRICS")
     for threshhold in threshholds:
-        temp_predictions = prediction_scores_sorted > threshhold
+        threshhold_a = threshhold(prediction_scores_sorted)
+        threshhold_b = threshhold(prediction_scores_sorted, axis=0)
+
+        pred_filter_a = prediction_scores_sorted > threshhold_a
+        pred_filter_b = prediction_scores_sorted > threshhold_b
+        pred_a = np.zeros_like(prediction_scores_sorted)
+        pred_b = np.zeros_like(prediction_scores_sorted)
+        pred_a[pred_filter_a] = 1
+        pred_b[pred_filter_b] = 1
+
         for average in averages:
             for func, name in score_funcs:
-                log(f"{average}-{name} at p>{threshhold}: {func(target_scores,temp_predictions, average=average)}"
+                log(f"{average}-{name} at p>{threshhold_a} A: {func(target_scores, pred_a, average=average)}"
                     )
-    from deepxml.evaluation import get_precision2, get_recall2, get_f1
+                log(f"{average}-{name} at p>{threshhold_a} B: {func(target_scores, pred_b, average=average)}"
+                    )
+
+    from deepxml.evaluation import get_f1, get_precision2, get_recall2
 
     score_funcs = [
             (get_precision2, "Precision"),
             (get_recall2, "Recall"),
             (get_f1, "F1"),
             ]
-
     log("TOP-N METRICS")
     for top_n in n:
         for average in averages:
