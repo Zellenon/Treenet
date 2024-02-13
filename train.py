@@ -73,7 +73,7 @@ def train_model(cfg: DatasetConfig, model_cfg, refiner):
         model_path=model_path,
         emb_init=cfg.emb_init,
         **cfg.model,
-        **model_cfg)
+        **model_cfg["params"])
 
     if refiner == "CorNet":
         model.model = CorNetWrapper(backbone=model.model,

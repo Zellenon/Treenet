@@ -71,7 +71,7 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
         model_path=trained_model_path,
         emb_init=cfg.emb_init,
         **cfg.model,
-        **model_cfg)
+        **model_cfg["params"])
 
     predicted_scores, predicted_labels_encoded = model.predict(
             test_loader, k=labels_num) # TODO: This used to be cfg.valid_size. Maybe we need to change?
