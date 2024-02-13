@@ -25,9 +25,14 @@ model_dict = {
 }
 
 
-def train_model(cfg: DatasetConfig, model_cnf, refiner):
-    model, model_name, data_name = None, model_cnf["name"], cfg.name
-    model_path = results_dir / Path("models") / f"{model_name}-{data_name}"
+def train_model(cfg: DatasetConfig, model_cfg, refiner):
+    model, model_name, data_name = None, model_cfg["name"], cfg.name
+    model_path = results_dir / Path("models") / f"{model_name}-{data_name}-{refiner}"
+    model_path.unlink()
+    if not model_path.exists():
+        print("Successfully deleted trained model")
+    else:
+        print("Failed to delete trained model")
     mlb = get_mlb(
         cfg.label_binarizer,
         None,
@@ -61,27 +66,17 @@ def train_model(cfg: DatasetConfig, model_cnf, refiner):
         cfg.batch_size,
         num_workers=4,
     )
-    if "gpipe" not in model_cnf:
-        model = Model(
-            network=model_dict[model_name],
-            labels_num=labels_num,
-            model_path=model_path,
-            emb_init=emb_init,
-            **cfg.model,
-            **model_cnf["params"],
-        )
-    else:
-        model = GPipeModel(
-            model_name,
-            labels_num=labels_num,
-            model_path=model_path,
-            emb_init=emb_init,
-            **cfg.model,
-            **model_cnf["params"],
-        )
+    model = GPipeModel if "gpipe" in model_cfg else Model
+    model = model(network=model_dict[model_cfg["name"]],
+        labels_num=labels_num,
+        model_path=model_path,
+        emb_init=cfg.emb_init,
+        **cfg.model,
+        **model_cfg)
+
     if refiner == "CorNet":
         model.model = CorNetWrapper(backbone=model.model,
                                     labels_num=labels_num)
-    model.train(train_loader, valid_loader, **model_cnf["train"])
+    model.train(train_loader, valid_loader, **model_cfg["train"])
     # model.train(train_loader, valid_loader)
     logger.info("Finish Training")

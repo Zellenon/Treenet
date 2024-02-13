@@ -65,23 +65,8 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
     test_loader = DataLoader(MultiLabelDataset(test_x),
                              cfg.batch_size,
                              num_workers=4)
-    # model = (GPipeModel(
-    #     model_cfg["name"],
-    #     labels_num=labels_num,
-    #     model_path=trained_model_path,
-    #     emb_init=cfg.emb_init,
-    #     **cfg.model,
-    #     **model_cfg,
-    #     ) if "gpipe" in model_cfg else Model(
-    #         network=model_dict[model_cfg["name"]],
-    #         labels_num=labels_num,
-    #         model_path=trained_model_path,
-    #         emb_init=cfg.emb_init,
-    #         **cfg.model,
-    #         **model_cfg["params"],
-    #         ))
     model = GPipeModel if "gpipe" in model_cfg else Model
-    model =model(model_cfg["name"],
+    model = model(network=model_dict[model_cfg["name"]],
         labels_num=labels_num,
         model_path=trained_model_path,
         emb_init=cfg.emb_init,
