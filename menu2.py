@@ -18,7 +18,7 @@ def dataset_selector():
         exit_option_text="Back to Main",
     )
 
-    for path, name in app_config.all_datasets:
+    for path, name in app_config.all_datasets.items():
         menu.append_item(FunctionItem(name, app_config.add_dataset, args=[path]))
     return menu
 
@@ -34,7 +34,7 @@ def model_selector():
         exit_option_text="Back to Main",
     )
 
-    for path, name in app_config.all_models:
+    for path, name in app_config.all_models.items():
         menu.append_item(FunctionItem(name, app_config.add_model, args=[path]))
     return menu
 
