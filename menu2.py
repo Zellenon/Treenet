@@ -5,7 +5,7 @@ from consolemenu.items import SubmenuItem
 from consolemenu.items import FunctionItem
 from yaml import safe_load
 
-from global_config import AppConfig
+from global_config import AppConfig, result_log_dir
 
 app_config = AppConfig()
 
@@ -88,7 +88,11 @@ def train(dataset_cfg_path, model_cfg_path, refiner):
 
 
 def retest(dataset_cfg_path, model_cfg_path, refiner):
-    pass
+    from global_config import DatasetConfig
+    from test import predict
+    dataset_params = DatasetConfig(safe_load(open(dataset_cfg_path)))
+    model_params = safe_load(open(model_cfg_path))
+    predict(dataset_params, model_params, refiner)
 
 
 def evaluate(dataset_cfg_path, model_cfg_path, refiner):
@@ -98,7 +102,15 @@ def evaluate(dataset_cfg_path, model_cfg_path, refiner):
     dataset_params = DatasetConfig(safe_load(open(dataset_cfg_path)))
     model_params = safe_load(open(model_cfg_path))
 
-    evaluate(dataset_params, model_params, refiner)
+    results = evaluate(dataset_params, model_params, refiner)
+
+    with open(
+                  result_log_dir / model_params["name"] + "-" + dataset_params.name + "-" +
+                                     refiner + ".txt", 'w'
+                                     ) as logfile:
+        logfile.write("\n\n".join([f"{secname}:\n" +"\n".join(
+            [f"{metric}: {score}" for metric,score in sec.items()]
+            ) for secname, sec in results.items()]))
 
 
 app_config.tasks = {
