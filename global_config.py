@@ -9,6 +9,27 @@ config_dir = Path("configure/")
 model_config_dir = config_dir / Path("models")
 dataset_config_dir = config_dir / Path("datasets")
 results_dir = Path("results/")
+result_model_dir = results_dir / Path("models")
+result_test_dir = results_dir / Path("test_predictions")
+result_log_dir = results_dir / Path("logs")
+
+from deepxml.attentionxml import AttentionXML, CorNetAttentionXML
+from deepxml.bertxml import BertXML, CorNetBertXML
+from deepxml.meshprobenet import CorNetMeSHProbeNet, MeSHProbeNet, TreeNetMeSHProbeNet
+from deepxml.xmlcnn import XMLCNN, CorNetXMLCNN
+from global_config import Path
+
+model_dict = {
+        "AttentionXML": AttentionXML,
+        "CorNetAttentionXML": CorNetAttentionXML,
+        "MeSHProbeNet": MeSHProbeNet,
+        "CorNetMeSHProbeNet": CorNetMeSHProbeNet,
+        "TreeNetMeSHProbeNet": TreeNetMeSHProbeNet,
+        "BertXML": BertXML,
+        "CorNetBertXML": CorNetBertXML,
+        "XMLCNN": XMLCNN,
+        "CorNetXMLCNN": CorNetXMLCNN,
+        }
 
 
 class DatasetConfig:
