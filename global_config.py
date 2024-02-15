@@ -99,10 +99,10 @@ class AppConfig:
                         print(f"{k} with {model}-{dataset}-{refiner}")
                         try:
                             func(dataset, model, refiner)
-                        except Exception:
-                            print("Failed on {k} with {model}-{dataset}-{refiner}")
-                            print(Exception)
-    
+                        except Exception as e:
+                            print(f"Failed on {k} with {model}-{dataset}-{refiner}")
+                            print(e)
+
     def add_dataset(self, dataset):
             self.selected_datasets |= {dataset}
     
