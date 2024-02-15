@@ -85,17 +85,13 @@ class AppConfig:
     def exec(self):
         if not any(self.selected_refiners.values()):
             self.selected_refiners["None"] = True
+        if len(self.selected_models) < 1:
+            self.selected_models = {""}
 
-        for k, func in self.tasks.items():
-            if not self.selected_tasks[k]:
-                continue
-            for dataset in self.selected_datasets:
-                for refiner in self.selected_refiners.keys():
-                    if not self.selected_refiners[refiner]:
-                        continue
-                    if len(self.selected_models) < 1:
-                        self.selected_models = {""}
-                    for model in self.selected_models:
+        for dataset in self.selected_datasets:
+            for model in self.selected_models:
+                for refiner in [k for k, v in self.selected_refiners.items() if v]:
+                    for k, func in [(k,v) for k,v in self.tasks.items() if self.selected_tasks[k]]:
                         print(f"{k} with {model}-{dataset}-{refiner}")
                         try:
                             func(dataset, model, refiner)
