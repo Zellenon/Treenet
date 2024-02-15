@@ -2,27 +2,14 @@ from logzero import logger
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 
-from deepxml.attentionxml import AttentionXML, CorNetAttentionXML
-from deepxml.bertxml import BertXML, CorNetBertXML
 from deepxml.cornet import CorNetWrapper
 from deepxml.data_utils import get_data, get_mlb
 from deepxml.dataset import MultiLabelDataset
-from deepxml.meshprobenet import CorNetMeSHProbeNet, MeSHProbeNet, TreeNetMeSHProbeNet
-from deepxml.models import GPipeModel, Model
-from deepxml.xmlcnn import XMLCNN, CorNetXMLCNN
+from deepxml.models import Model
+from deepxml.models_gpipe import GPipeModel
 from global_config import DatasetConfig, Path,  results_dir
 
-model_dict = {
-        "AttentionXML": AttentionXML,
-        "CorNetAttentionXML": CorNetAttentionXML,
-        "MeSHProbeNet": MeSHProbeNet,
-        "CorNetMeSHProbeNet": CorNetMeSHProbeNet,
-        "TreeNetMeSHProbeNet": TreeNetMeSHProbeNet,
-        "BertXML": BertXML,
-        "CorNetBertXML": CorNetBertXML,
-        "XMLCNN": XMLCNN,
-        "CorNetXMLCNN": CorNetXMLCNN,
-        }
+from global_config import model_dict
 
 
 def train_model(cfg: DatasetConfig, model_cfg, refiner):
@@ -39,7 +26,6 @@ def train_model(cfg: DatasetConfig, model_cfg, refiner):
             None,
             )
     labels_num = len(mlb.classes_)
-    emb_init = cfg.emb_init
 
     logger.info("Loading Training and Validation Set")
     train_x, train_labels = get_data(cfg.data["train"])
