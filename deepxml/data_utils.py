@@ -86,7 +86,7 @@ def convert_to_binary(
         with open(label_file) as fp:
             labels = np.array(
                 [
-                    [label for label in re.split(spliter, line)]
+                    [label for label in re.split(spliter, line) if len(label) > 0]
                     for line in tqdm(fp, desc="Converting labels", leave=False)
                 ],
                 dtype=object,
