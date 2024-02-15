@@ -128,4 +128,4 @@ class AppConfig:
         return "  ".join([f"{color(k, fg='green' if v else 'red')}" for k, v in self.selected_refiners.items()])
     
     def all_info(self):
-        return "\n\n".join([self.get_refiners(), self.get_tasks(), self.get_datasets(), self.get_models()])
+        return "\n\n\n".join([self.get_refiners(), self.get_tasks(), self.get_datasets(), self.get_models()])
