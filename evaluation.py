@@ -43,8 +43,8 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
     labels_num = len(all_labels)
 
     pred_filename = f'{model_cfg["name"]}-{cfg.name}-{refiner_choice}'
-    predicted_scores = np.load(result_test_dir / (pred_filename + "-scores"), allow_pickle=True)
-    predicted_labels_decoded = np.load(result_test_dir / (pred_filename + "-labels"), allow_pickle=True)
+    predicted_scores = np.load(result_test_dir / (pred_filename + "-scores.npy"), allow_pickle=True)
+    predicted_labels_decoded = np.load(result_test_dir / (pred_filename + "-labels.npy"), allow_pickle=True)
 
     target_labels = np.load(cfg.data["test"].labels_npy, allow_pickle=True)
     logger.info("conversion loop 1 beginning")
