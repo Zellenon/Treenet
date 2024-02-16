@@ -55,13 +55,12 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
             for i in range(len(predicted_scores))
             ]
     prediction_dicts = [{u: v for u, v in w} for w in temp]
-    print("Formatting labels")
+    logger.info("Formatting labels")
     prediction_scores_sorted = [[w.get(v, 0) for v in all_labels]
                                 for w in prediction_dicts]
     prediction_scores_sorted = np.array(prediction_scores_sorted)
 
-    print(target_scores.shape)
-    print(prediction_scores_sorted.shape)
+    logger.info("Running Threshhold Evaluations")
 
     threshholds = [
             ("GHM", lambda *a, **k: np.max(*a, **k) / 2),
@@ -95,6 +94,7 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
                 threshhold_metrics[f"{average}-{name} at p: {name}R:"] =func(target_scores, pred_r, average=average)
     log["THRESHHOLD METRICS"] = threshhold_metrics
 
+    logger.info("Running TopN Evaluations")
 
     from deepxml.evaluation import get_f1, get_precision2, get_recall2
     top_n_metrics = dict()
@@ -109,6 +109,7 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
                 top_n_metrics[f"{average}-{name} at n={top_n}"] = func(predicted_labels_decoded,target_labels, mlb, top=top_n, ave=average)
     log["TOP-N METRICS"] = top_n_metrics
 
+    logger.info("Running DeepXML Evaluations")
 
     deepxml_metrics = dict()
     score_funcs = [
@@ -119,6 +120,7 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
         deepxml_metrics[f"{name} at n=5"] = func(predicted_labels_decoded,target_labels, mlb)
     log["DeepXML Metrics"] = deepxml_metrics
 
+    logger.info("Running BertMESH Evaluations")
 
     bertmesh_metrics = dict()
     MiP = np.sum(predicted_scores * target_scores) / np.sum(predicted_scores)
