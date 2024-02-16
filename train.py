@@ -61,8 +61,7 @@ def train_model(cfg: DatasetConfig, model_cfg, refiner):
             **model_cfg["params"]
             }
     if refiner == "CorNet":
-        kwargs["backbone"] = network
-        kwargs["labels_num"] = labels_num
+        kwargs["backbone_fn"] = network
         network = CorNetWrapper
 
     model = model(network=network,

@@ -47,7 +47,7 @@ class CorNetWrapper(nn.Module):
         if backbone:
             self.backbone = backbone.cuda()
         elif backbone_fn:
-            self.backbone = backbone(labels_num, **kwargs)
+            self.backbone = backbone_fn(labels_num, **kwargs)
         else:
             raise Exception
         self.cornet = CorNet(labels_num, **kwargs).cuda()

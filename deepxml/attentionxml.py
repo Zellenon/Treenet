@@ -140,12 +140,12 @@ class AttentionXML(nn.Module):
 class CorNetAttentionXML(nn.Module):
     def __init__(
         self,
-        labels_num,
-        emb_size,
-        hidden_size,
-        layers_num,
-        linear_size,
-        dropout,
+        labels_num=None,
+        emb_size=None,
+        hidden_size=None,
+        layers_num=None,
+        linear_size=None,
+        dropout=None,
         **kwargs,
     ):
         super(CorNetAttentionXML, self).__init__()

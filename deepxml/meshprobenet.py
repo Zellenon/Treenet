@@ -53,12 +53,12 @@ class PlainC(nn.Module):
 class MeSHProbeNet(nn.Module):
     def __init__(
         self,
-        emb_size,
-        hidden_size,
-        n_layers,
-        n_probes,
-        labels_num,
-        dropout,
+        labels_num=None,
+        emb_size=None,
+        hidden_size=None,
+        n_layers=None,
+        n_probes=None,
+        dropout=None,
         vocab_size=None,
         emb_init=None,
         emb_trainable=True,

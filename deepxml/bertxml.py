@@ -450,7 +450,7 @@ class PlainC(nn.Module):
     
 #%%
 class BertXML(nn.Module):
-    def __init__(self, hidden_size, n_layers, n_aheads, intermediate_size, dropout, labels_num, n_probes, **kwargs):
+    def __init__(self, labels_num, hidden_size, n_layers, n_aheads, intermediate_size, dropout, n_probes, **kwargs):
         super(BertXML, self).__init__()
         self.tewp = BaseBertModel(hidden_size, n_layers, n_probes, n_aheads, intermediate_size,  dropout, **kwargs)
         self.plaincls = PlainC(labels_num, hidden_size, n_probes)
