@@ -89,8 +89,7 @@ class Model(object):
                             labels.append(tmp.cpu())
                     valid_loss /= len(valid_loader)
                     labels = np.concatenate(labels)
-                    ##
-                    #                    labels = np.concatenate([self.predict_step(valid_x, k)[1] for valid_x in valid_loader])
+                    # labels = np.concatenate([self.predict_step(valid_x, k)[1] for valid_x in valid_loader])
                     targets = valid_loader.dataset.data_y
                     p5, n5, p1 = (
                         get_p_5(labels, targets),
@@ -107,10 +106,9 @@ class Model(object):
                     self.swap_swa_params()
                     if verbose:
                         log_msg = (
-                            "%d %d train loss: %.7f valid loss: %.7f P@5: %.5f P@1: %.5f N@5: %.5f early stop: %d"
+                            "%d train loss: %.7f valid loss: %.7f P@5: %.5f P@1: %.5f N@5: %.5f early stop: %d"
                             % (
                                 epoch_idx,
-                                i * train_loader.batch_size,
                                 print_loss / step,
                                 valid_loss,
                                 round(p5, 5),
