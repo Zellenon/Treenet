@@ -53,17 +53,23 @@ def train_model(cfg: DatasetConfig, model_cfg, refiner):
             cfg.batch_size,
             num_workers=4,
             )
+
     model = GPipeModel if "gpipe" in model_cfg else Model
-    model = model(network=model_dict[model_cfg["name"]],
+    network = model_dict[model_cfg["name"]]
+    kwargs = {
+            **cfg.model,
+            **model_cfg["params"]
+            }
+    if refiner == "CorNet":
+        kwargs["backbone"] = network
+        kwargs["labels_num"] = labels_num
+        network = CorNetWrapper
+
+    model = model(network=network,
                   labels_num=labels_num,
                   model_path=model_path,
                   emb_init=cfg.emb_init,
-                  **cfg.model,
-                  **model_cfg["params"])
+                  **kwargs)
 
-    if refiner == "CorNet":
-        model.model = CorNetWrapper(backbone=model.model,
-                                    labels_num=labels_num)
     model.train(train_loader, valid_loader, **model_cfg["train"])
-    # model.train(train_loader, valid_loader)
     logger.info("Finish Training")
