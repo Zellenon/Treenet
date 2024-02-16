@@ -66,7 +66,7 @@ class AppConfig:
     def __init__(self):
         self.task_names = {"PRE" : "Pre-process Database",
                            "TRAIN" : "Train Model with Dataset",
-                           "RETEST" : "Regenerate test predictions",
+                           "TEST" : "Generate test predictions",
                            "EVAL" : "Evaluate Trained Model"
                            }
         self.tasks = {k:(lambda x,y,z: x+y+z) for k, _ in self.task_names.items()}

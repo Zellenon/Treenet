@@ -87,7 +87,7 @@ def train(dataset_cfg_path, model_cfg_path, refiner):
     train_model(dataset_params, model_params, refiner)
 
 
-def retest(dataset_cfg_path, model_cfg_path, refiner):
+def test(dataset_cfg_path, model_cfg_path, refiner):
     from global_config import DatasetConfig
     from test import predict
     dataset_params = DatasetConfig(safe_load(open(dataset_cfg_path)))
@@ -116,7 +116,7 @@ def evaluate(dataset_cfg_path, model_cfg_path, refiner):
 app_config.tasks = {
     "PRE": pre_process,
     "TRAIN": train,
-    "RETEST": retest,
+    "TEST": test,
     "EVAL": evaluate
 }
 
