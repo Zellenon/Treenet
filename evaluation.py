@@ -77,7 +77,7 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
     log = dict()
     threshhold_metrics = dict()
     
-    for name, threshhold in threshholds:
+    for formula, threshhold in threshholds:
         threshhold_d = threshhold(prediction_scores_sorted)
         threshhold_r = threshhold(prediction_scores_sorted, axis=0)
 
@@ -90,8 +90,8 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
 
         for average in averages:
             for func, name in score_funcs:
-                threshhold_metrics[f"{average}-{name} at p: {name}D:"] =func(target_scores, pred_d, average=average)
-                threshhold_metrics[f"{average}-{name} at p: {name}R:"] =func(target_scores, pred_r, average=average)
+                threshhold_metrics[f"{average}-{name} at p: {formula}D:"] =func(target_scores, pred_d, average=average)
+                threshhold_metrics[f"{average}-{name} at p: {formula}R:"] =func(target_scores, pred_r, average=average)
     log["THRESHHOLD METRICS"] = threshhold_metrics
 
     logger.info("Running TopN Evaluations")
