@@ -2,7 +2,7 @@ from pathlib import Path
 
 import numpy as np
 from colors import color
-from yaml import safe_load
+from yaml import safe_load, dump
 
 def ensure(path: Path):
     if not path.exists():
@@ -90,7 +90,28 @@ class AppConfig:
         self.selected_models = set()
         self.debug_mode = False
 
+    def save(self):
+        data = {
+                "selected_datasets": self.selected_datasets,
+                "selected_models": self.selected_models,
+                "selected_refiners": self.selected_refiners,
+                "selected_tasks": self.selected_tasks,
+                }
+        with open("last_run.yaml", 'w') as f:
+            f.write(dump(data))
+
+    def load(self):
+        path = Path("last_run.yaml")
+        if path.exists():
+            with open(path) as f:
+                data = safe_load(f.read())
+                self.selected_datasets = data["selected_datasets"]
+                self.selected_models = data["selected_models"]
+                self.selected_refiners = data["selected_refiners"]
+                self.selected_tasks = data["selected_tasks"]
+
     def exec(self):
+        self.save()
         if not any(self.selected_refiners.values()):
             self.selected_refiners["None"] = True
         if len(self.selected_models) < 1:

@@ -3,3 +3,4 @@ __pycache__
 db
 deepxml/__pycache__
 venv
+last_run.yaml

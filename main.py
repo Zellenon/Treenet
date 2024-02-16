@@ -138,6 +138,9 @@ if __name__ == "__main__":
     task_menu = SubmenuItem("Select Tasks", task_selector())
     task_menu.set_menu(menu)
     menu.append_item(task_menu)
+
+    menu.append_item(FunctionItem("Load last run", app_config.load, args=[]))
+
     menu.start()
     menu.join()
     app_config.exec()
