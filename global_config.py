@@ -88,6 +88,7 @@ class AppConfig:
         self.selected_refiners = {k: False for k in ["None", "CorNet", "TreeNet"]}
         self.selected_datasets = set()
         self.selected_models = set()
+        self.debug_mode = False
 
     def exec(self):
         if not any(self.selected_refiners.values()):
@@ -100,11 +101,15 @@ class AppConfig:
                 for refiner in [k for k, v in self.selected_refiners.items() if v]:
                     for k, func in [(k,v) for k,v in self.tasks.items() if self.selected_tasks[k]]:
                         print(f"{k} with {model}-{dataset}-{refiner}")
-                        try:
+                        if not self.debug_mode:
+                            try:
+                                func(dataset, model, refiner)
+                            except Exception as e:
+                                print(f"Failed on {k} with {model}-{dataset}-{refiner}")
+                                print(e)
+                        else:
                             func(dataset, model, refiner)
-                        except Exception as e:
-                            print(f"Failed on {k} with {model}-{dataset}-{refiner}")
-                            print(e)
+
 
     def add_dataset(self, dataset):
             self.selected_datasets |= {dataset}
