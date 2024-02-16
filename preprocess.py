@@ -4,7 +4,6 @@ import re
 spliter = re.compile(r"[ ,\t\n]")
 from functools import reduce
 
-import ipdb
 import numpy as np
 from logzero import logger
 from nltk.tokenize import word_tokenize
@@ -12,9 +11,6 @@ from tqdm import tqdm
 
 from deepxml.data_utils import build_vocab, convert_to_binary, get_mlb
 from global_config import DatasetConfig
-
-# Good for debugging, not needed for function
-# import ipdb
 
 
 def tokenize(sentence: str, sep="/SEP/"):

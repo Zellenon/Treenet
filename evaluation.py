@@ -2,22 +2,16 @@ import warnings
 
 from global_config import DatasetConfig, result_test_dir
 
-from pathlib import Path
 
 import numpy as np
 from logzero import logger
 from sklearn import metrics
 from concurrent.futures import ThreadPoolExecutor
-from torch.utils.data import DataLoader
 
 from deepxml.attentionxml import AttentionXML, CorNetAttentionXML
 from deepxml.bertxml import BertXML, CorNetBertXML
-from deepxml.data_utils import get_data, output_res
-from deepxml.dataset import MultiLabelDataset
 from deepxml.evaluation import *
 from deepxml.meshprobenet import CorNetMeSHProbeNet, MeSHProbeNet, TreeNetMeSHProbeNet
-from deepxml.models import Model
-from deepxml.models_gpipe import GPipeModel
 from deepxml.xmlcnn import XMLCNN, CorNetXMLCNN
 
 warnings.filterwarnings("ignore")

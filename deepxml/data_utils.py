@@ -1,20 +1,15 @@
 import os
 import re
 from collections import Counter
-from typing import Iterable, Union
-
 import joblib
 import numpy as np
-from gensim.models import KeyedVectors
 from sklearn.datasets import load_svmlight_file
 from sklearn.preprocessing import MultiLabelBinarizer, normalize
 from tqdm import tqdm
-
-spliter = re.compile(r"[ ,\t\n]")
-from typing import Dict, Iterable, Tuple, Union
-
+from typing import Iterable, Tuple, Union, List, Dict
 from global_config import DatasetSubConfig
 
+spliter = re.compile(r"[ ,\t\n]")
 
 def build_vocab(
     texts: Iterable,
@@ -72,15 +67,13 @@ def get_data(cfg_data: DatasetSubConfig):
 
 
 def convert_to_binary(
-    text_file, label_file=None, max_len=None, vocab=None, pad="<PAD>", unknown="<UNK>"
-):
+        text_file: str, label_file=None, max_len: int = 50000, vocab: Dict=dict(), pad="<PAD>", unknown="<UNK>"
+) -> tuple[np.ndarray, np.ndarray | None]:
     with open(text_file) as fp:
         texts = [
             [vocab.get(word, vocab[unknown]) for word in line.split()]
             for line in tqdm(fp, desc="Converting token to id", leave=False)
         ]
-        # print([len(w) for w in texts])
-        # texts = np.asarray(texts)
     labels = None
     if label_file is not None:
         with open(label_file) as fp:
@@ -94,7 +87,7 @@ def convert_to_binary(
     return truncate_text(texts, max_len, vocab[pad], vocab[unknown]), labels
 
 
-def truncate_text(texts, max_len=500, padding_idx=0, unknown_idx=1):
+def truncate_text(texts, max_len=500, padding_idx=0, unknown_idx=1) -> np.ndarray:
     if max_len is None:
         return texts
     texts = np.asarray(
