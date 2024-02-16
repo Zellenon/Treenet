@@ -60,22 +60,29 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
                                 for w in prediction_dicts]
     prediction_scores_sorted = np.array(prediction_scores_sorted)
 
-    logger.info("Running Threshhold Evaluations")
 
+    logger.info("Running Threshhold Evaluations")
+    log = dict()
+
+
+    threshhold_metrics = dict()
     threshholds = [
-            ("GHM", lambda *a, **k: np.max(*a, **k) / 2),
-            ("GAGHM", lambda a, **k: a[a > a.max(**k) / 2].mean(**k)),
+            ("HMD", lambda *a: np.max(*a) / 2),
+            ("HMR", lambda *a: np.max(*a, axis=0) / 2),
+            ("ARGHMR", lambda a: a[a > a.max(axis=0) / 2].mean(axis=0)),
+            ("ARGHM", lambda a: a[a > a.max() / 2].mean(axis=0)),
+            ("AGHMR", lambda a: a[a > a.max(axis=0) / 2].mean()),
+            ("AGHM", lambda a: a[a > a.max() / 2].mean()),
             ]
     n = [1, 5]
-    averages = ["micro", "macro"]
+    # averages = ["micro", "macro"]
+    averages = ["micro"]
     score_funcs = [
             (metrics.precision_score, "Precision"),
             (metrics.recall_score, "Recall"),
             (metrics.f1_score, "F1"),
             ]
 
-    log = dict()
-    threshhold_metrics = dict()
     
     for formula, threshhold in threshholds:
         threshhold_d = threshhold(prediction_scores_sorted)
