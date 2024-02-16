@@ -1,6 +1,6 @@
 import warnings
 
-from global_config import DatasetConfig, results_dir
+from global_config import DatasetConfig, result_test_dir
 
 from pathlib import Path
 
@@ -42,7 +42,7 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
     all_labels = mlb.classes_
     labels_num = len(all_labels)
 
-    pred_filename = f'{model_cfg["name"]}-{cfg.name}-{refiner_choice}'
+    pred_filename = result_test_dir / f'{model_cfg["name"]}-{cfg.name}-{refiner_choice}'
     predicted_scores = np.load(pred_filename + "-scores", allow_pickle=True)
     predicted_labels_decoded = np.load(pred_filename + "-labels", allow_pickle=True)
 

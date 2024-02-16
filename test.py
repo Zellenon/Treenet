@@ -16,7 +16,7 @@ from deepxml.evaluation import *
 from deepxml.models import Model
 from deepxml.models_gpipe import GPipeModel
 
-from global_config import model_dict
+from global_config import model_dict, result_test_dir
 
 warnings.filterwarnings("ignore")
 
@@ -54,7 +54,7 @@ def predict(cfg: DatasetConfig, model_cfg, refiner_choice):
     logger.info("Finish Predicting")
 
     output_res(
-            cfg.output_dir,
+            result_test_dir,
             f'{model_cfg["name"]}-{cfg.name}-{refiner_choice}',
             predicted_scores,
             predicted_labels_decoded,
