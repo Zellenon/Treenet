@@ -5,10 +5,6 @@ params:
   layers_num: 1
   linear_size: [100]
   dropout: 0.5
-  nb_epoch: 30
-  swa_warmup: 10
 
 train:
-  batch_size: 40
-  nb_epoch: 30
-  swa_warmup: 10
+  batch_size: 200
