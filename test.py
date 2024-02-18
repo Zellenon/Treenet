@@ -37,16 +37,22 @@ def predict(cfg: DatasetConfig, model_cfg, refiner_choice):
     test_loader = DataLoader(MultiLabelDataset(test_x),
                              cfg.batch_size,
                              num_workers=4)
+
     model = GPipeModel if "gpipe" in model_cfg else Model
-    model = model(network=model_dict[model_cfg["name"]],
+    network = model_dict[model_cfg["name"]]
+    kwargs = {
+            **cfg.model,
+            **model_cfg["params"]
+            }
+    if refiner_choice == "CorNet":
+        kwargs["backbone_fn"] = network
+        network = CorNetWrapper
+
+    model = model(network=network,
                   labels_num=labels_num,
                   model_path=trained_model_path,
                   emb_init=cfg.emb_init,
-                  **cfg.model,
-                  **model_cfg["params"])
-    if refiner_choice == "CorNet":
-        model.model = CorNetWrapper(backbone=model.model,
-                                    labels_num=labels_num)
+                  **kwargs)
 
     predicted_scores, predicted_labels_encoded = model.predict(
             test_loader, k=labels_num) # TODO: This used to be cfg.valid_size. Maybe we need to change?
