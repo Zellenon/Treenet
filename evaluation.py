@@ -67,8 +67,8 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
 
     threshhold_metrics = dict()
     threshholds = [
-            ("HMD", lambda a: np.max(*a) / 2),
-            ("HMR", lambda a: np.max(*a, axis=0) / 2),
+            ("HMD", lambda a: np.max(a) / 2),
+            ("HMR", lambda a: np.max(a, axis=0) / 2),
             ("ARGHMR", lambda a: np.mean(a[a > np.max(a, axis=0) / 2], axis=0)),
             ("ARGHM", lambda a: np.mean(a[a > np.max(a) / 2], axis=0)),
             ("AGHMR", lambda a: np.mean(a[a > np.max(a, axis=0) / 2])),
