@@ -1,4 +1,7 @@
 from pathlib import Path
+from deepxml.cornet import CorNetWrapper
+from deepxml.models import Model
+from deepxml.models_gpipe import GPipeModel
 from typing import Dict
 
 import numpy as np
@@ -135,29 +138,29 @@ class AppConfig:
 
 
     def add_dataset(self, dataset):
-            self.selected_datasets |= {dataset}
-    
+        self.selected_datasets |= {dataset}
+
     def get_datasets(self):
         return "\n".join(self.selected_datasets)
-    
+
     def add_model(self, model):
         self.selected_models |= {model}
-    
+
     def get_models(self):
         return "\n".join(self.selected_models)
-    
+
     def toggle_task(self, key):
         self.selected_tasks[key] = not self.selected_tasks[key]
-    
+
     def get_tasks(self):
         return "\n".join([f"{color(self.task_names[k], fg='green' if v else 'red')}" for k, v in self.selected_tasks.items()])
-    
+
     def toggle_refiner(self, key):
         self.selected_refiners[key] = not self.selected_refiners[key]
-    
+
     def get_refiners(self):
         return "  ".join([f"{color(k, fg='green' if v else 'red')}" for k, v in self.selected_refiners.items()])
-    
+
     def all_info(self):
         return "\n\n\n".join([self.get_refiners(), self.get_tasks(), self.get_datasets(), self.get_models()])
 
@@ -171,3 +174,20 @@ def trained_log_path(cfg: DatasetConfig, model_cfg: Dict, refiner_choice: str):
 
 def trained_test_path(cfg: DatasetConfig, model_cfg: Dict, refiner_choice: str):
     return result_test_dir / Path(f"{model_cfg['name']}-{cfg.name}-{refiner_choice}")
+
+def make_model(cfg: DatasetConfig, model_cfg: Dict, refiner_choice: str, labels_num):
+    model = GPipeModel if "gpipe" in model_cfg else Model
+    network = model_dict[model_cfg["name"]]
+    kwargs = {
+            **cfg.model,
+            **model_cfg["params"]
+            }
+    if refiner_choice == "CorNet":
+        kwargs["backbone_fn"] = network
+        network = CorNetWrapper
+
+    return model(network=network,
+                 labels_num=labels_num,
+                 model_path=trained_model_path(cfg, model_cfg, refiner_choice),
+                 emb_init=cfg.emb_init,
+                 **kwargs)

@@ -1,15 +1,10 @@
 from logzero import logger
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
-
-from deepxml.cornet import CorNetWrapper
 from deepxml.data_utils import get_data, get_mlb
 from deepxml.dataset import MultiLabelDataset
-from deepxml.models import Model
-from deepxml.models_gpipe import GPipeModel
-from global_config import DatasetConfig, Path, trained_model_path
-
-from global_config import model_dict
+from global_config import trained_model_path
+from global_config import DatasetConfig, make_model
 
 
 def train_model(cfg: DatasetConfig, model_cfg, refiner):
@@ -54,21 +49,7 @@ def train_model(cfg: DatasetConfig, model_cfg, refiner):
             num_workers=4,
             )
 
-    model = GPipeModel if "gpipe" in model_cfg else Model
-    network = model_dict[model_cfg["name"]]
-    kwargs = {
-            **cfg.model,
-            **model_cfg["params"]
-            }
-    if refiner == "CorNet":
-        kwargs["backbone_fn"] = network
-        network = CorNetWrapper
-
-    model = model(network=network,
-                  labels_num=labels_num,
-                  model_path=model_path,
-                  emb_init=cfg.emb_init,
-                  **kwargs)
+    model = make_model(cfg, model_cfg, refiner, labels_num)
 
     model.train(train_loader, valid_loader, **model_cfg["train"])
     logger.info("Finish Training")
