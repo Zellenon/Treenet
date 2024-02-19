@@ -20,7 +20,7 @@ results_dir = Path("results/")
 result_model_dir = results_dir / Path("models")
 result_test_dir = results_dir / Path("test_predictions")
 result_log_dir = results_dir / Path("logs")
-system_dirs =  [data_dir, config_dir, model_config_dir, dataset_config_dir, results_dir, result_log_dir, result_model_dir, result_log_dir]
+system_dirs =  [data_dir, config_dir, model_config_dir, dataset_config_dir, results_dir, result_log_dir, result_model_dir, result_test_dir]
 for dir in system_dirs:
     ensure(dir)
 
