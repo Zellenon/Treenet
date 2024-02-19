@@ -7,14 +7,14 @@ from deepxml.data_utils import get_data, get_mlb
 from deepxml.dataset import MultiLabelDataset
 from deepxml.models import Model
 from deepxml.models_gpipe import GPipeModel
-from global_config import DatasetConfig, Path,  results_dir
+from global_config import DatasetConfig, Path, trained_model_path
 
 from global_config import model_dict
 
 
 def train_model(cfg: DatasetConfig, model_cfg, refiner):
-    model, model_name, data_name = None, model_cfg["name"], cfg.name
-    model_path = results_dir / Path("models") / f"{model_name}-{data_name}-{refiner}"
+    model, model_name = None, model_cfg["name"]
+    model_path = trained_model_path(cfg, model_cfg, refiner)
     if model_path.exists():
         model_path.unlink()
     if not model_path.exists():

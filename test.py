@@ -1,3 +1,4 @@
+from typing import Dict
 import warnings
 from logzero import logger
 from torch.utils.data import DataLoader
@@ -16,11 +17,11 @@ from deepxml.evaluation import *
 from deepxml.models import Model
 from deepxml.models_gpipe import GPipeModel
 
-from global_config import model_dict, result_test_dir
+from global_config import model_dict, trained_model_path, trained_test_path
 
 warnings.filterwarnings("ignore")
 
-def predict(cfg: DatasetConfig, model_cfg, refiner_choice):
+def predict(cfg: DatasetConfig, model_cfg: Dict, refiner_choice: str):
     import joblib
 
     logger.info("Loading MLB")
@@ -28,7 +29,6 @@ def predict(cfg: DatasetConfig, model_cfg, refiner_choice):
     all_labels = mlb.classes_
     labels_num = len(all_labels)
     test_x, _ = get_data(cfg.data["test"])
-    trained_model_path = Path(f"results/models/{model_cfg['name']}-{cfg.name}")
 
     logger.info(f"Found a total of {labels_num} labels in the dataset")
     logger.info(f"Size of Test Set: {len(test_x)}")
@@ -50,7 +50,7 @@ def predict(cfg: DatasetConfig, model_cfg, refiner_choice):
 
     model = model(network=network,
                   labels_num=labels_num,
-                  model_path=trained_model_path,
+                  model_path=trained_model_path(cfg, model_cfg, refiner_choice),
                   emb_init=cfg.emb_init,
                   **kwargs)
 
@@ -60,7 +60,7 @@ def predict(cfg: DatasetConfig, model_cfg, refiner_choice):
     logger.info("Finish Predicting")
 
     output_res(
-            result_test_dir,
+            trained_test_path(cfg, model_cfg, refiner_choice),
             f'{model_cfg["name"]}-{cfg.name}-{refiner_choice}',
             predicted_scores,
             predicted_labels_decoded,

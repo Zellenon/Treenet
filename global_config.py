@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Dict
 
 import numpy as np
 from colors import color
@@ -19,6 +20,7 @@ result_log_dir = results_dir / Path("logs")
 system_dirs =  [data_dir, config_dir, model_config_dir, dataset_config_dir, results_dir, result_log_dir, result_model_dir, result_log_dir]
 for dir in system_dirs:
     ensure(dir)
+
 
 from deepxml.attentionxml import AttentionXML, CorNetAttentionXML
 from deepxml.bertxml import BertXML, CorNetBertXML
@@ -158,3 +160,14 @@ class AppConfig:
     
     def all_info(self):
         return "\n\n\n".join([self.get_refiners(), self.get_tasks(), self.get_datasets(), self.get_models()])
+
+
+
+def trained_model_path(cfg: DatasetConfig, model_cfg: Dict, refiner_choice: str):
+    return result_model_dir / Path(f"{model_cfg['name']}-{cfg.name}-{refiner_choice}")
+
+def trained_log_path(cfg: DatasetConfig, model_cfg: Dict, refiner_choice: str):
+    return result_log_dir / Path(f"{model_cfg['name']}-{cfg.name}-{refiner_choice}")
+
+def trained_test_path(cfg: DatasetConfig, model_cfg: Dict, refiner_choice: str):
+    return result_test_dir / Path(f"{model_cfg['name']}-{cfg.name}-{refiner_choice}")
