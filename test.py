@@ -40,7 +40,6 @@ def predict(cfg: DatasetConfig, model_cfg: Dict, refiner_choice: str):
 
     output_res(
             trained_test_path(cfg, model_cfg, refiner_choice),
-            f'{model_cfg["name"]}-{cfg.name}-{refiner_choice}',
             predicted_scores,
             predicted_labels_decoded,
             )

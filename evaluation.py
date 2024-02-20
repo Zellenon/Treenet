@@ -1,6 +1,6 @@
 import warnings
 
-from global_config import DatasetConfig, result_test_dir
+from global_config import DatasetConfig, trained_test_path
 
 
 import numpy as np
@@ -36,9 +36,10 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
     all_labels = mlb.classes_
     labels_num = len(all_labels)
 
-    pred_filename = f'{model_cfg["name"]}-{cfg.name}-{refiner_choice}'
-    predicted_scores = np.load(result_test_dir / (pred_filename + "-scores.npy"), allow_pickle=True)
-    predicted_labels_decoded = np.load(result_test_dir / (pred_filename + "-labels.npy"), allow_pickle=True)
+    predicted_scores = np.load(str(trained_test_path(cfg,model_cfg,refiner_choice)) 
+                               + "-scores.npy", allow_pickle=True)
+    predicted_labels_decoded = np.load(str(trained_test_path(cfg,model_cfg,refiner_choice)) 
+                                       + "-labels.npy", allow_pickle=True)
 
     target_labels = np.load(cfg.data["test"].labels_npy, allow_pickle=True)
     logger.info("conversion loop 1 beginning")

@@ -111,7 +111,6 @@ def get_sparse_feature(feature_file, label_file):
     return normalize(sparse_x), np.load(label_file) if label_file is not None else None
 
 
-def output_res(output_path, name, scores, labels):
-    os.makedirs(output_path, exist_ok=True)
-    np.save(os.path.join(output_path, f"{name}-scores"), scores)
-    np.save(os.path.join(output_path, f"{name}-labels"), labels)
+def output_res(output_path, scores, labels):
+    np.save(str(output_path) + "-scores", scores)
+    np.save(str(output_path) + "-labels", labels)
