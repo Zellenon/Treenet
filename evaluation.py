@@ -75,7 +75,7 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
             ("AGHMR", lambda a: np.mean(a[a > np.max(a, axis=0) / 2])),
             ("AGHM", lambda a: np.mean(a[a > a.max() / 2])),
             ]
-    n = [1, 5]
+    n = [1, 3, 5]
     # averages = ["micro", "macro"]
     averages = ["micro"]
     score_funcs = [
@@ -117,7 +117,9 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
     deepxml_metrics = dict()
     score_funcs = [
             (get_p_5, "Precision"),
-            (get_n_5, "NDCG"),
+            (get_n_1), "NDCG1",
+            (get_n_3), "NDCG3",
+            (get_n_5, "NDCG5"),
             ]
     for func, name in score_funcs:
         deepxml_metrics[f"{name} at n=5"] = func(predicted_labels_decoded,target_labels, mlb)
