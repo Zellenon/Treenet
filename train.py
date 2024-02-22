@@ -51,5 +51,5 @@ def train_model(cfg: DatasetConfig, model_cfg, refiner):
 
     model = make_model(cfg, model_cfg, refiner, labels_num)
 
-    model.train(train_loader, valid_loader, **model_cfg["train"])
+    model.train(train_loader, valid_loader, {**model_cfg["train"], **cfg.params})
     logger.info("Finish Training")

@@ -65,6 +65,7 @@ class DatasetConfig:
         self.batch_size = yaml["batch_size"]
         self.model = yaml["model"]
         self.output_dir = yaml["output"]["res"]
+        self.params = yaml["params"]
 
 
 class DatasetSubConfig:
