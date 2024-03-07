@@ -55,6 +55,8 @@ class DatasetConfig:
                 "test": DatasetSubConfig("test", self.folder, yaml),
                 }
         self.vocab = self.folder / Path(yaml["vocab"])
+        self.vocab_size = yaml["vocab_size"] or 500000
+        self.text_len = yaml["text_len"] or 500
         self.emb_init_path = self.folder / Path(yaml["embedding"]["emb_init"])
         try:
             self.emb_init = np.load(self.emb_init_path, allow_pickle=True)
