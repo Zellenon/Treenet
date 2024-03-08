@@ -10,9 +10,7 @@ def pre_process(dataset_cfg_path, _, _2):
     from global_config import DatasetConfig
     from preprocess import process
     cfg = DatasetConfig(safe_load(open(dataset_cfg_path)))
-    process(cfg,
-            vocab_size=cfg.vocab_size,
-            max_len=cfg.text_len)
+    process(cfg)
 
 
 def train(dataset_cfg_path, model_cfg_path, refiner):
