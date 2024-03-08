@@ -23,7 +23,7 @@ def tokenize_line(sentence: str):
     ]
 
 
-def tokenize_file(file) -> list[str]:
+def tokenize_file(file):
     with ThreadPoolExecutor(35) as exec:
         return list(tqdm(exec.map(tokenize_line, file), desc="Tokenizing"))
 
@@ -34,7 +34,7 @@ def process(cfg: DatasetConfig, vocab_size: int, max_len: int):
         outpath = cfg.data[split].text_npy
         with open(textpath) as text_file, open(outpath, "w") as output_file:
             for line in tokenize_file(text_file):
-                print(*tokenize_line(line), file=output_file)
+                print(*line, file=output_file)
 
     vocab = process_vocab(cfg, vocab_size)
 
