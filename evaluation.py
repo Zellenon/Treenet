@@ -117,8 +117,8 @@ def evaluate(cfg: DatasetConfig, model_cfg, refiner_choice):
     deepxml_metrics = dict()
     score_funcs = [
             (get_p_5, "Precision"),
-            (get_n_1), "NDCG1",
-            (get_n_3), "NDCG3",
+            (get_n_1, "NDCG1"),
+            (get_n_3, "NDCG3"),
             (get_n_5, "NDCG5"),
             ]
     for func, name in score_funcs:
