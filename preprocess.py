@@ -7,8 +7,7 @@ from functools import reduce
 import numpy as np
 from logzero import logger
 from nltk.tokenize import word_tokenize
-from tqdm import tqdm
-from concurrent.futures import ThreadPoolExecutor
+from tqdm.contrib.concurrent import process_map
 
 from deepxml.data_utils import build_vocab, convert_to_binary, get_mlb
 from global_config import DatasetConfig
@@ -24,8 +23,7 @@ def tokenize_line(sentence: str):
 
 
 def tokenize_file(file):
-    with ThreadPoolExecutor(35) as exec:
-        return list(tqdm(exec.map(tokenize_line, file), desc="Tokenizing"))
+        return process_map(tokenize_line, file, desc="Tokenizing", max_workers=35, chunksize=2)
 
 
 def process(cfg: DatasetConfig, vocab_size: int, max_len: int):
