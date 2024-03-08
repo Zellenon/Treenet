@@ -9,7 +9,7 @@ from logzero import logger
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from deepxml.evaluation import get_n_5, get_p_5, get_p_1
+from deepxml.evaluation import get_r_3, get_n_3, get_p_1
 from deepxml.optimizers import DenseSparseAdam
 
 
@@ -62,8 +62,9 @@ class Model(object):
         swa_warmup=None,
         **kwargs,
     ):
+        # self.get_optimizer(**({} if opt_params is None else opt_params))
         self.get_optimizer(**({} if opt_params is None else opt_params))
-        global_step, best_n5, e = 0, 0.0, 0
+        global_step, best_r3, e = 0, 0.0, 0
         print_loss = 0.0  #
         for epoch_idx in range(nb_epoch):
             if epoch_idx == swa_warmup:
@@ -91,14 +92,14 @@ class Model(object):
                     labels = np.concatenate(labels)
                     # labels = np.concatenate([self.predict_step(valid_x, k)[1] for valid_x in valid_loader])
                     targets = valid_loader.dataset.data_y
-                    p5, n5, p1 = (
-                        get_p_5(labels, targets),
-                        get_n_5(labels, targets),
+                    r3, n3, p1 = (
+                        get_r_3(labels, targets),
+                        get_n_3(labels, targets),
                         get_p_1(labels, targets),
                     )
-                    if n5 > best_n5:
+                    if r3 > best_r3:
                         self.save_model(True)  # epoch_idx > 1 * swa_warmup)
-                        best_n5, e = n5, 0
+                        best_r3, e = r3, 0
                     else:
                         e += 1
                         if early is not None and e > early:
@@ -111,9 +112,9 @@ class Model(object):
                                 epoch_idx,
                                 print_loss / step,
                                 valid_loss,
-                                round(p5, 5),
+                                round(r3, 5),
+                                round(n3, 5),
                                 round(p1, 5),
-                                round(n5, 5),
                                 e,
                             )
                         )
