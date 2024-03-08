@@ -3,6 +3,7 @@ import re
 from collections import Counter
 import joblib
 import numpy as np
+from tqdm.contrib.concurrent import process_map
 from sklearn.datasets import load_svmlight_file
 from sklearn.preprocessing import MultiLabelBinarizer, normalize
 from tqdm import tqdm
@@ -69,11 +70,14 @@ def get_data(cfg_data: DatasetSubConfig):
 def text_to_binary(
         text_file: str, max_len: int = 50000, vocab: Dict=dict(), pad="<PAD>", unknown="<UNK>"
 ) -> np.ndarray:
+    def convert(line):
+        return [vocab.get(word, vocab[unknown]) for word in line.split()]
     with open(text_file) as fp:
-        texts = [
-            [vocab.get(word, vocab[unknown]) for word in line.split()]
-            for line in tqdm(fp, desc="Converting token to id", leave=False)
-        ]
+        texts = process_map(convert, fp, desc="Tokenizing", max_workers=50, chunksize=20)
+        # texts = [
+        #     [vocab.get(word, vocab[unknown]) for word in line.split()]
+        #     for line in tqdm(fp, desc="Converting token to id", leave=False)
+        # ]
     return truncate_text(texts, max_len, vocab[pad], vocab[unknown])
 
 
