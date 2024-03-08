@@ -1,13 +1,11 @@
 import warnings
 
-from global_config import DatasetConfig, trained_test_path
-
-
 import numpy as np
 from logzero import logger
 from sklearn import metrics
 from concurrent.futures import ThreadPoolExecutor
 
+from global_config import DatasetConfig, trained_test_path
 from deepxml.attentionxml import AttentionXML, CorNetAttentionXML
 from deepxml.bertxml import BertXML, CorNetBertXML
 from deepxml.evaluation import *
