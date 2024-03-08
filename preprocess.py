@@ -7,9 +7,10 @@ from functools import reduce
 import numpy as np
 from logzero import logger
 from nltk.tokenize import word_tokenize
+from tqdm import tqdm
 from tqdm.contrib.concurrent import process_map
 
-from deepxml.data_utils import build_vocab, convert_to_binary, get_mlb
+from deepxml.data_utils import build_vocab, get_mlb, text_to_binary, labels_to_binary
 from global_config import DatasetConfig
 
 
@@ -26,25 +27,29 @@ def tokenize_file(file):
         return process_map(tokenize_line, file, desc="Tokenizing", max_workers=35, chunksize=40)
 
 
-def process(cfg: DatasetConfig, vocab_size: int, max_len: int):
+def process(cfg: DatasetConfig):
+    logger.info(f"Tokenizing.")
     for split in ["train", "test"]:
         textpath = cfg.data[split].text
         outpath = cfg.data[split].text_npy
         with open(textpath) as text_file, open(outpath, "w") as output_file:
-            for line in tokenize_file(text_file):
+            for line in tqdm(tokenize_file(text_file), desc="Outputting tokens"):
                 print(*line, file=output_file)
 
-    vocab = process_vocab(cfg, vocab_size)
+    logger.info(f"Building Vocab.")
+    vocab = process_vocab(cfg)
 
+    logger.info(f"Building binarizer.")
     build_binarizer(cfg)
 
     for split in ["train", "test"]:
         textpath = cfg.data[split].text
         labelpath = cfg.data[split].labels
         logger.info(f"Getting Dataset: {textpath} Max Length: {labelpath}")
-        texts, labels = convert_to_binary(
-            textpath.parent / (textpath.name + ""), labelpath, max_len, vocab
-        )
+
+        texts = text_to_binary(textpath.parent / (textpath.name + ""), cfg.text_len, vocab)
+        labels = labels_to_binary(labelpath)
+
         [[n for n in w if len(n) > 0] for w in labels]
         logger.info(f"Size of Samples: {len(texts)}")
         np.save(cfg.data[split].text_npy, texts)
@@ -53,13 +58,12 @@ def process(cfg: DatasetConfig, vocab_size: int, max_len: int):
             np.save(cfg.data[split].labels_npy, labels)
 
 
-def process_vocab(cfg: DatasetConfig, vocab_size: int):
-    logger.info(f"Building Vocab.")
+def process_vocab(cfg: DatasetConfig):
     from w2vfile import w2v
 
     logger.info(f"Imported w2v model")
     with open(cfg.data["train"].text) as fp:
-        vocab, emb_init = build_vocab(fp, w2v, vocab_size=vocab_size)
+        vocab, emb_init = build_vocab(fp, w2v, vocab_size=cfg.vocab_size)
     np.save(cfg.vocab, vocab)
     np.save(cfg.emb_init_path, emb_init)
     vocab = {word: i for i, word in enumerate(np.load(cfg.vocab))}
@@ -94,6 +98,5 @@ def build_binarizer(cfg: DatasetConfig):
 
     labels = {w for w in labels if len(w) > 0}
 
-    print(labels)
     print("Training MLB on labels")
     get_mlb(cfg.label_binarizer, [labels])

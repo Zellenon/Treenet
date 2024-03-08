@@ -6,7 +6,8 @@ import numpy as np
 from sklearn.datasets import load_svmlight_file
 from sklearn.preprocessing import MultiLabelBinarizer, normalize
 from tqdm import tqdm
-from typing import Iterable, Tuple, Union, List, Dict
+from typing import Iterable, Dict
+from pathlib import Path
 from global_config import DatasetSubConfig
 
 spliter = re.compile(r"[ ,\t\n]")
@@ -21,7 +22,6 @@ def build_vocab(
     max_times=1,
     freq_times=1,
 ):
-    # w2v_model = KeyedVectors.load(str(w2v_model))
     emb_size = w2v_model.vector_size
     vocab, emb_init = (
         [pad, unknown],
@@ -66,25 +66,24 @@ def get_data(cfg_data: DatasetSubConfig):
     )
 
 
-def convert_to_binary(
-        text_file: str, label_file=None, max_len: int = 50000, vocab: Dict=dict(), pad="<PAD>", unknown="<UNK>"
-) -> tuple[np.ndarray, np.ndarray | None]:
+def text_to_binary(
+        text_file: str, max_len: int = 50000, vocab: Dict=dict(), pad="<PAD>", unknown="<UNK>"
+) -> np.ndarray:
     with open(text_file) as fp:
         texts = [
             [vocab.get(word, vocab[unknown]) for word in line.split()]
             for line in tqdm(fp, desc="Converting token to id", leave=False)
         ]
-    labels = None
-    if label_file is not None:
-        with open(label_file) as fp:
-            labels = np.array(
-                [
-                    [label for label in re.split(spliter, line) if len(label) > 0]
-                    for line in tqdm(fp, desc="Converting labels", leave=False)
-                ],
-                dtype=object,
-            )
-    return truncate_text(texts, max_len, vocab[pad], vocab[unknown]), labels
+    return truncate_text(texts, max_len, vocab[pad], vocab[unknown])
+
+
+def labels_to_binary(label_file: str) -> np.ndarray:
+    with open(label_file) as fp:
+        return np.array([
+                [label for label in re.split(spliter, line) if len(label) > 0]
+                for line in tqdm(fp, desc="Converting labels", leave=False)
+            ], dtype=object,
+        )
 
 
 def truncate_text(texts, max_len=500, padding_idx=0, unknown_idx=1) -> np.ndarray:
@@ -97,7 +96,7 @@ def truncate_text(texts, max_len=500, padding_idx=0, unknown_idx=1) -> np.ndarra
     return texts
 
 
-def get_mlb(mlb_path, labels=None) -> MultiLabelBinarizer:
+def get_mlb(mlb_path: Path, labels=None) -> MultiLabelBinarizer:
     if os.path.exists(mlb_path):
         return joblib.load(mlb_path)
     mlb = MultiLabelBinarizer(sparse_output=True)
