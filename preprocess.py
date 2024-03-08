@@ -8,18 +8,24 @@ import numpy as np
 from logzero import logger
 from nltk.tokenize import word_tokenize
 from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor
 
 from deepxml.data_utils import build_vocab, convert_to_binary, get_mlb
 from global_config import DatasetConfig
 
 
-def tokenize(sentence: str, sep="/SEP/"):
+def tokenize_line(sentence: str):
     # We added a /SEP/ symbol between titles and descriptions such as Amazon datasets.
     return [
-        token.lower() if token != sep else token
+        token.lower() if token != "/SEP/" else token
         for token in word_tokenize(sentence)
         if len(re.sub(r"[^\w]", "", token)) > 0
     ]
+
+
+def tokenize_file(file) -> list[str]:
+    with ThreadPoolExecutor(35) as exec:
+        return list(tqdm(exec.map(tokenize_line, file), desc="Tokenizing"))
 
 
 def process(cfg: DatasetConfig, vocab_size: int, max_len: int):
@@ -27,8 +33,8 @@ def process(cfg: DatasetConfig, vocab_size: int, max_len: int):
         textpath = cfg.data[split].text
         outpath = cfg.data[split].text_npy
         with open(textpath) as text_file, open(outpath, "w") as output_file:
-            for line in tqdm(text_file, desc="Tokenizing"):
-                print(*tokenize(line), file=output_file)
+            for line in tokenize_file(text_file):
+                print(*tokenize_line(line), file=output_file)
 
     vocab = process_vocab(cfg, vocab_size)
 
