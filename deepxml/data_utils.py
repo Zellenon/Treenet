@@ -73,7 +73,7 @@ def text_to_binary(
     def convert(line):
         return [vocab.get(word, vocab[unknown]) for word in line.split()]
     with open(text_file) as fp:
-        texts = process_map(convert, fp, desc="Tokenizing", max_workers=50, chunksize=20)
+        texts = process_map(convert, fp, desc="Tokenizing", max_workers=50, chunksize=80)
         # texts = [
         #     [vocab.get(word, vocab[unknown]) for word in line.split()]
         #     for line in tqdm(fp, desc="Converting token to id", leave=False)

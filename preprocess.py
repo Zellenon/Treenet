@@ -24,7 +24,7 @@ def tokenize_line(sentence: str):
 
 
 def tokenize_file(file):
-    return process_map(tokenize_line, file, desc="Tokenizing", max_workers=35, chunksize=10)
+    return process_map(tokenize_line, file, desc="Tokenizing", max_workers=50, chunksize=80)
 
 
 def process(cfg: DatasetConfig):
