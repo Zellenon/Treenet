@@ -75,7 +75,7 @@ def get_recall2(
     mlb: TMlb = None,
     classes: TClass = None,
     top=5,
-    ave="binary",
+    ave="micro",
 ):
     # if ave == 'binary':
     #     return get_precision(prediction, targets, mlb, classes, top)
